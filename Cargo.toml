@@ -1,0 +1,20 @@
+[package]
+name = "game_off_2022"
+version = "0.1.0"
+edition = "2021"
+authors = ["Joris Hartog <jorishartog@hotmail.com>", "Guus van Wonderen", "Tim Pool"]
+
+[dependencies]
+bevy = "0.8.1"
+
+# Required by Bevy
+[workspace]
+resolver = "2"
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
