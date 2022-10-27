@@ -9,7 +9,7 @@ struct Player {
 }
 
 #[derive(Component)]
-struct ColorText;
+struct Camera;
 
 fn main() {
     App::new()
@@ -24,36 +24,46 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn_bundle(Camera3dBundle {
-        transform: Transform::from_xyz(7.0, 7.0, 10.0)
-            .looking_at(Vec3::new(0.0, 3.0, 0.0), Vec3::Y),
-        ..default()
-    });
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
     commands
-        .spawn_bundle(
-            TextBundle::from_section(
-                "Game Off 2022",
-                TextStyle {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 100.0,
-                    color: Color::YELLOW,
-                },
-            )
-            .with_style(Style {
-                align_self: AlignSelf::FlexEnd,
-                position_type: PositionType::Absolute,
-                ..default()
-            }),
+        .spawn_bundle(Camera3dBundle {
+            transform: Transform::from_xyz(5.0, 2.0, -2.0)
+                .looking_at(Vec3::new(0.0, 1.0, 0.0), Vec3::Y),
+            ..default()
+        })
+        .insert(Camera);
+    commands.spawn_bundle(
+        TextBundle::from_section(
+            "Game Off\n2022",
+            TextStyle {
+                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                font_size: 100.0,
+                color: Color::YELLOW,
+            },
         )
-        .insert(ColorText);
+        .with_style(Style {
+            align_self: AlignSelf::FlexEnd,
+            position_type: PositionType::Absolute,
+            position: UiRect {
+                left: Val::Px(100.0),
+                bottom: Val::Px(100.0),
+                ..default()
+            },
+            ..default()
+        }),
+    );
     commands.spawn_bundle(DirectionalLightBundle {
         directional_light: DirectionalLight {
             shadow_projection: OrthographicProjection {
-                left: -1.0,
-                right: 1.0,
-                bottom: -1.0,
-                top: 1.0,
+                left: -10.0,
+                right: 10.0,
+                bottom: -10.0,
+                top: 10.0,
                 near: -10.0,
                 far: 10.0,
                 ..default()
@@ -69,10 +79,20 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         })
         .insert(Player { speed: 5.0 });
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Plane { size: 100.0 })),
+        material: materials.add(StandardMaterial {
+            base_color: Color::rgb(0.2, 0.2, 0.2),
+            perceptual_roughness: 0.08,
+            ..default()
+        }),
+        ..default()
+    });
 }
 
 fn player_movement(
-    mut player_query: Query<(&Player, &mut Transform)>,
+    mut player_query: Query<(&Player, &mut Transform), Without<Camera>>,
+    mut camera_query: Query<&mut Transform, With<Camera>>,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
@@ -103,6 +123,12 @@ fn player_movement(
 
     if keyboard.pressed(KeyCode::D) {
         transform.rotate_local_y(-player.speed * time.delta_seconds());
+    }
+
+    for mut camera_transform in &mut camera_query {
+        camera_transform.rotation = camera_transform
+            .looking_at(transform.translation, Vec3::Y)
+            .rotation;
     }
 }
 
