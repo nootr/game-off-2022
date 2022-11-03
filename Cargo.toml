@@ -6,6 +6,7 @@ authors = ["Joris Hartog <jorishartog@hotmail.com>", "Guus van Wonderen", "Tim P
 
 [dependencies]
 bevy = "0.8.1"
+rand = "0.8.5"
 
 # Required by Bevy
 [workspace]
