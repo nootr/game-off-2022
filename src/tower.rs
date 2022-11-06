@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::game::{Game, GameState};
-use crate::physics::{Collider, ColliderBundle};
+use crate::physics::{Collider, ColliderBundle, Solid};
 use crate::sprite::AnimationTimer;
 
 #[derive(Component)]
@@ -34,12 +34,12 @@ fn setup_tower(
         .insert(Tower)
         .insert_bundle(ColliderBundle {
             collider: Collider {
-                solid: true,
                 hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
                 ..Default::default()
             },
             ..Default::default()
-        });
+        })
+        .insert(Solid);
 }
 
 fn hit_system(mut game: ResMut<Game>, mut tower_query: Query<&Collider, With<Tower>>) {

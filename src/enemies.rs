@@ -37,6 +37,8 @@ fn spawn_enemy(
 
     let height: f32 = rand::thread_rng().gen_range(-half_height..half_height);
 
+    let moving = Moving::new(Vec3::new(100.0, 0.0, 0.0));
+
     commands
         .spawn_bundle(SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
@@ -52,9 +54,7 @@ fn spawn_enemy(
                 hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
                 ..Default::default()
             },
-            moving: Moving {
-                velocity: Vec3::new(100.0, 0.0, 0.0),
-            },
+            moving,
         })
         .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
         .insert(Enemy);
@@ -69,10 +69,10 @@ fn turn_enemy(
 
     for (mut moving, transform) in &mut enemy_query {
         // Slowly point enemy towards tower
-        let to_tower = (tower_transform.translation - transform.translation).normalize()
-            * moving.velocity.length();
+        let to_tower =
+            (tower_transform.translation - transform.translation).normalize() * moving.speed;
 
-        let turning_speed = time.delta_seconds() * 500.0;
+        let turning_speed = time.delta_seconds() * 5000.0;
         moving.velocity = ((turning_speed - 1.0) * moving.velocity + to_tower) / turning_speed;
     }
 }

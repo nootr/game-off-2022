@@ -5,11 +5,13 @@ mod game;
 mod physics;
 mod sprite;
 mod tower;
+mod walls;
 use enemies::EnemySpawnerPlugin;
 use game::GamePlugin;
 use physics::PhysicsPlugin;
 use sprite::SpritePlugin;
 use tower::TowerPlugin;
+use walls::WallPlugin;
 
 fn main() {
     App::new()
@@ -21,6 +23,7 @@ fn main() {
         .add_plugin(EnemySpawnerPlugin)
         .add_plugin(GamePlugin)
         .add_plugin(PhysicsPlugin)
+        .add_plugin(WallPlugin)
         .run();
 }
 
