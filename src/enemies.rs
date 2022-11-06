@@ -49,10 +49,12 @@ fn spawn_enemy(
         })
         .insert_bundle(ColliderBundle {
             collider: Collider {
-                hit: false,
                 hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
+                ..Default::default()
             },
-            moving: Moving { velocity: 100.0 },
+            moving: Moving {
+                velocity: Vec3::new(100.0, 0.0, 0.0),
+            },
         })
         .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
         .insert(Enemy);
@@ -60,16 +62,17 @@ fn spawn_enemy(
 
 fn turn_enemy(
     mut tower_query: Query<&Transform, With<Tower>>,
-    mut enemy_query: Query<&mut Transform, (With<Enemy>, Without<Tower>)>,
+    mut enemy_query: Query<(&mut Moving, &Transform), (With<Enemy>, Without<Tower>)>,
+    time: Res<Time>,
 ) {
     let tower_transform = tower_query.single_mut();
 
-    for mut transform in &mut enemy_query {
+    for (mut moving, transform) in &mut enemy_query {
         // Slowly point enemy towards tower
-        let to_tower =
-            (transform.translation.truncate() - tower_transform.translation.truncate()).normalize();
-        transform.rotation = (transform.rotation * 99.0
-            + Quat::from_rotation_arc(-Vec3::X, to_tower.extend(0.)))
-            / 100.0;
+        let to_tower = (tower_transform.translation - transform.translation).normalize()
+            * moving.velocity.length();
+
+        let turning_speed = time.delta_seconds() * 500.0;
+        moving.velocity = ((turning_speed - 1.0) * moving.velocity + to_tower) / turning_speed;
     }
 }

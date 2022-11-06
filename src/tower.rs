@@ -34,8 +34,9 @@ fn setup_tower(
         .insert(Tower)
         .insert_bundle(ColliderBundle {
             collider: Collider {
-                hit: false,
+                solid: true,
                 hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
+                ..Default::default()
             },
             ..Default::default()
         });
