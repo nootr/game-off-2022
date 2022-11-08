@@ -63,9 +63,14 @@ fn collision_system(
                 solid_transform.translation,
                 solid_collider.hit_box,
             ) {
+                // TODO: remove
+                if collider.hit {
+                    println!("Consecutive hits!");
+                }
+
                 if !collider.hit {
                     collider_transform.translation = collider_transform.translation
-                        - moving.velocity.normalize() * moving.speed * time.delta_seconds();
+                        - moving.velocity.normalize() * moving.speed * 2.0 * time.delta_seconds();
                 }
 
                 solid_collider.hit = true;
@@ -74,9 +79,9 @@ fn collision_system(
                 let (reflect_x, reflect_y) = match collision {
                     Collision::Left => (moving.velocity.x > 0.0, false),
                     Collision::Right => (moving.velocity.x < 0.0, false),
-                    Collision::Top => (false, moving.velocity.y < 0.0),
                     Collision::Bottom => (false, moving.velocity.y > 0.0),
-                    Collision::Inside => (moving.velocity.x < 0.0, moving.velocity.y < 0.0),
+                    Collision::Top => (false, moving.velocity.y < 0.0),
+                    Collision::Inside => (false, false),
                 };
 
                 if reflect_x {

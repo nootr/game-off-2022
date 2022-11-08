@@ -1,6 +1,7 @@
 use bevy::{prelude::*, time::FixedTimestep};
 use rand::Rng;
 
+use crate::pathfinding::VectorField;
 use crate::physics::{Collider, ColliderBundle, Moving};
 use crate::sprite::AnimationTimer;
 use crate::tower::Tower;
@@ -37,7 +38,7 @@ fn spawn_enemy(
 
     let height: f32 = rand::thread_rng().gen_range(-half_height..half_height);
 
-    let moving = Moving::new(Vec3::new(100.0, 0.0, 0.0));
+    let moving = Moving::new(Vec3::new(300.0, 0.0, 0.0));
 
     commands
         .spawn_bundle(SpriteSheetBundle {
@@ -61,17 +62,13 @@ fn spawn_enemy(
 }
 
 fn turn_enemy(
-    mut tower_query: Query<&Transform, With<Tower>>,
     mut enemy_query: Query<(&mut Moving, &Transform), (With<Enemy>, Without<Tower>)>,
+    vector_field: Res<VectorField>,
     time: Res<Time>,
 ) {
-    let tower_transform = tower_query.single_mut();
-
     for (mut moving, transform) in &mut enemy_query {
         // Slowly point enemy towards tower
-        let to_tower =
-            (tower_transform.translation - transform.translation).normalize() * moving.speed;
-
+        let to_tower = vector_field.get_direction(transform.translation) * moving.speed;
         let turning_speed = time.delta_seconds() * 5000.0;
         moving.velocity = ((turning_speed - 1.0) * moving.velocity + to_tower) / turning_speed;
     }
