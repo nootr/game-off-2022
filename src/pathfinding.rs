@@ -15,6 +15,7 @@
 //! Step 3 and 4 are recursively repeated.
 
 use bevy::{prelude::*, time::FixedTimestep};
+use log::debug;
 use rand::Rng;
 use std::{cmp, fmt};
 
@@ -272,5 +273,5 @@ fn update_vector_field(
     }
 
     vector_field.generate();
-    println!("{}", *vector_field);
+    debug!("{}", *vector_field);
 }

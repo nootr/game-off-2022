@@ -2,6 +2,7 @@ use bevy::{
     prelude::*,
     sprite::collide_aabb::{collide, Collision},
 };
+use log::warn;
 
 #[derive(Component)]
 pub struct Solid;
@@ -65,7 +66,7 @@ fn collision_system(
             ) {
                 // TODO: remove
                 if collider.hit {
-                    println!("Consecutive hits!");
+                    warn!("Consecutive hits!");
                 }
 
                 if !collider.hit {
