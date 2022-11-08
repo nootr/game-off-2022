@@ -12,7 +12,6 @@
 //!    non-solid neighbouring Cell is set towards the root cell.
 //! 4. Step 3 is repeated for each non-solid neighbouring Cell (first N/E/S/W, then diagonally).
 //!
-//! Step 3 and 4 are recursively repeated.
 
 use bevy::{prelude::*, time::FixedTimestep};
 use log::debug;

@@ -1,6 +1,7 @@
 use bevy::{prelude::*, time::FixedTimestep};
 use rand::Rng;
 
+use crate::force::Force;
 use crate::pathfinding::VectorField;
 use crate::physics::{Collider, ColliderBundle, Moving};
 use crate::sprite::AnimationTimer;
@@ -62,14 +63,21 @@ fn spawn_enemy(
 }
 
 fn turn_enemy(
+    mut force_query: Query<(&Force, &Transform), (With<Force>, Without<Tower>, Without<Enemy>)>,
     mut enemy_query: Query<(&mut Moving, &Transform), (With<Enemy>, Without<Tower>)>,
     vector_field: Res<VectorField>,
     time: Res<Time>,
 ) {
     for (mut moving, transform) in &mut enemy_query {
         // Slowly point enemy towards tower
-        let to_tower = vector_field.get_direction(transform.translation) * moving.speed;
+        let mut force_sum = vector_field.get_direction(transform.translation) * moving.speed;
+
+        for (force, force_transform) in &mut force_query {
+            force_sum +=
+                (force_transform.translation - transform.translation).normalize() * force.newton;
+        }
+
         let turning_speed = time.delta_seconds() * 5000.0;
-        moving.velocity = ((turning_speed - 1.0) * moving.velocity + to_tower) / turning_speed;
+        moving.velocity = ((turning_speed - 1.0) * moving.velocity + force_sum) / turning_speed;
     }
 }

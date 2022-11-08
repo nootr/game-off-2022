@@ -1,6 +1,7 @@
 use bevy::{prelude::*, render::texture::ImageSettings};
 
 mod enemies;
+mod force;
 mod game;
 mod level;
 mod pathfinding;
@@ -8,6 +9,7 @@ mod physics;
 mod sprite;
 mod tower;
 use enemies::EnemySpawnerPlugin;
+use force::ForcePlugin;
 use game::GamePlugin;
 use level::LevelPlugin;
 use pathfinding::VectorFieldPlugin;
@@ -27,6 +29,7 @@ fn main() {
         .add_plugin(EnemySpawnerPlugin)
         .add_plugin(GamePlugin)
         .add_plugin(PhysicsPlugin)
+        .add_plugin(ForcePlugin)
         .run();
 }
 
