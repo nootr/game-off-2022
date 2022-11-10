@@ -9,7 +9,7 @@ path = "src/lib.rs"
 
 [[bin]]
 path = "src/main.rs"
-name = "elephant"
+name = "trumpet-trainee"
 
 [dependencies]
 bevy = "0.8.1"
