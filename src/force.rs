@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
 use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
@@ -6,6 +6,20 @@ use crate::sprite::AnimationTimer;
 #[derive(Component)]
 pub struct Force {
     pub newton: f32,
+    pub influence: f32,
+}
+
+impl Force {
+    pub fn get_force(&self, position: Vec3, force_position: Vec3) -> Option<Vec3> {
+        let vector = force_position - position;
+        let distance = vector.length() / 4.0;
+
+        if distance < self.influence {
+            return Some(vector.normalize() * self.newton);
+        }
+
+        return None;
+    }
 }
 
 pub struct ForcePlugin;
@@ -22,6 +36,8 @@ fn mouse_button_input(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     windows: Res<Windows>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let window = windows.primary();
 
@@ -34,6 +50,16 @@ fn mouse_button_input(
 
             let position = raw_position - Vec2::new(window.width(), window.height()) / 2.0;
 
+            let influence = 50.0;
+
+            let force_field = commands
+                .spawn_bundle(MaterialMesh2dBundle {
+                    mesh: meshes.add(Mesh::from(shape::Circle::new(influence))).into(),
+                    material: materials.add(ColorMaterial::from(Color::rgba(1.0, 0.0, 0.0, 0.5))),
+                    ..default()
+                })
+                .id();
+
             commands
                 .spawn_bundle(SpriteSheetBundle {
                     texture_atlas: texture_atlas_handle,
@@ -45,11 +71,15 @@ fn mouse_button_input(
                     ..default()
                 })
                 .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
-                .insert(Force { newton: 10.0 })
+                .insert(Force {
+                    newton: 500.0,
+                    influence,
+                })
                 .insert(Collider {
                     ..Default::default()
                 })
-                .insert(Solid);
+                .insert(Solid)
+                .push_children(&[force_field]);
         }
     }
 }

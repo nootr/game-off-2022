@@ -73,8 +73,9 @@ fn turn_enemy(
         let mut force_sum = vector_field.get_direction(transform.translation) * moving.speed;
 
         for (force, force_transform) in &mut force_query {
-            force_sum +=
-                (force_transform.translation - transform.translation).normalize() * force.newton;
+            if let Some(f) = force.get_force(transform.translation, force_transform.translation) {
+                force_sum += f;
+            }
         }
 
         let turning_speed = time.delta_seconds() * 5000.0;
