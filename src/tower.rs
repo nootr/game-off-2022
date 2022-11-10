@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::camera::CameraShake;
 use crate::game::{Game, GameState};
 use crate::physics::{Collider, ColliderBundle, Solid};
 use crate::sprite::AnimationTimer;
@@ -42,10 +43,21 @@ fn setup_tower(
         .insert(Solid);
 }
 
-fn hit_system(mut game: ResMut<Game>, mut tower_query: Query<&Collider, With<Tower>>) {
+fn hit_system(
+    mut game: ResMut<Game>,
+    mut tower_query: Query<&Collider, With<Tower>>,
+    mut camera_query: Query<&mut CameraShake, Without<Tower>>,
+) {
     let tower_collider = tower_query.single_mut();
 
-    if tower_collider.hit && game.state == GameState::Running {
+    if !tower_collider.hit {
+        return;
+    }
+
+    if game.state == GameState::Running {
+        let mut shake = camera_query.single_mut();
+        shake.trauma += 0.7;
+
         game.state = GameState::GameOver;
     }
 }
