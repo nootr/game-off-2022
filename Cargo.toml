@@ -4,6 +4,13 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Joris Hartog <jorishartog@hotmail.com>", "Guus van Wonderen", "Tim Pool"]
 
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "elephant"
+
 [dependencies]
 bevy = "0.8.1"
 log = "0.4.17"
