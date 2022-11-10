@@ -70,7 +70,7 @@ fn turn_enemy(
 ) {
     for (mut moving, transform) in &mut enemy_query {
         // Slowly point enemy towards tower
-        let mut force_sum = vector_field.get_direction(transform.translation) * moving.speed;
+        let mut force_sum = vector_field.get_direction(transform.translation) * moving.speed.abs();
 
         for (force, force_transform) in &mut force_query {
             if let Some(f) = force.get_force(transform.translation, force_transform.translation) {

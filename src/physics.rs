@@ -22,10 +22,21 @@ impl Default for Collider {
     }
 }
 
-#[derive(Component, Default)]
+#[derive(Component)]
 pub struct Moving {
     pub velocity: Vec3,
     pub speed: f32,
+    last_delta: Option<Vec3>,
+}
+
+impl Default for Moving {
+    fn default() -> Self {
+        Moving {
+            velocity: Vec3::X,
+            speed: 0.0,
+            last_delta: None,
+        }
+    }
 }
 
 impl Moving {
@@ -33,6 +44,7 @@ impl Moving {
         Moving {
             velocity,
             speed: velocity.length(),
+            ..Default::default()
         }
     }
 }
@@ -54,7 +66,6 @@ impl Plugin for PhysicsPlugin {
 fn collision_system(
     mut solid_query: Query<(&mut Collider, &Transform), With<Solid>>,
     mut collider_query: Query<(&mut Collider, &mut Moving, &mut Transform), Without<Solid>>,
-    time: Res<Time>,
 ) {
     for (mut collider, mut moving, mut collider_transform) in &mut collider_query {
         for (mut solid_collider, solid_transform) in &mut solid_query {
@@ -70,8 +81,9 @@ fn collision_system(
                 }
 
                 if !collider.hit {
-                    collider_transform.translation = collider_transform.translation
-                        - moving.velocity.normalize() * moving.speed * 2.0 * time.delta_seconds();
+                    if let Some(delta) = moving.last_delta {
+                        collider_transform.translation = collider_transform.translation - delta;
+                    }
                 }
 
                 solid_collider.hit = true;
@@ -99,8 +111,10 @@ fn collision_system(
     }
 }
 
-fn move_system(mut query: Query<(&Moving, &mut Transform)>, time: Res<Time>) {
-    for (moving, mut transform) in &mut query {
-        transform.translation += moving.velocity * time.delta_seconds();
+fn move_system(mut query: Query<(&mut Moving, &mut Transform)>, time: Res<Time>) {
+    for (mut moving, mut transform) in &mut query {
+        let delta = moving.velocity.normalize() * moving.speed * time.delta_seconds();
+        moving.last_delta = Some(delta);
+        transform.translation += delta;
     }
 }
