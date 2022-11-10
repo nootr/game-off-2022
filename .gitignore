@@ -1,3 +1,9 @@
+# Cargo
 /target
 /dist
+
+# Vim
 *.swp
+
+# MacOS finder
+.DS_Store
