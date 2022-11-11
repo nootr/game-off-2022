@@ -1,3 +1,4 @@
+#![allow(clippy::type_complexity)]
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
 mod camera;

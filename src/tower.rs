@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::camera::CameraShake;
-use crate::game::{Game, GameState};
+use crate::game::{GameState, Volatile};
 use crate::physics::{Collider, ColliderBundle, Solid};
 use crate::sprite::AnimationTimer;
 
@@ -12,7 +12,9 @@ pub struct TowerPlugin;
 
 impl Plugin for TowerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup_tower).add_system(hit_system);
+        app.add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_tower))
+            .add_system_set(SystemSet::on_update(GameState::InGame).with_system(hit_tower))
+            .add_system_set(SystemSet::on_exit(GameState::InGame).with_system(remove_tower));
     }
 }
 
@@ -40,24 +42,29 @@ fn setup_tower(
             },
             ..Default::default()
         })
-        .insert(Solid);
+        .insert(Solid)
+        .insert(Volatile);
 }
 
-fn hit_system(
-    mut game: ResMut<Game>,
-    mut tower_query: Query<&Collider, With<Tower>>,
+fn hit_tower(
+    mut game_state: ResMut<State<GameState>>,
+    tower_query: Query<&Collider, With<Tower>>,
     mut camera_query: Query<&mut CameraShake, Without<Tower>>,
 ) {
-    let tower_collider = tower_query.single_mut();
+    let tower_collider = tower_query.single();
 
     if !tower_collider.hit {
         return;
     }
 
-    if game.state == GameState::Running {
-        let mut shake = camera_query.single_mut();
-        shake.trauma += 0.7;
+    let mut shake = camera_query.single_mut();
+    shake.trauma += 0.7;
 
-        game.state = GameState::GameOver;
-    }
+    game_state.set(GameState::GameOver).unwrap();
+}
+
+fn remove_tower(mut commands: Commands, tower_query: Query<Entity, With<Tower>>) {
+    let tower = tower_query.single();
+
+    commands.entity(tower).despawn();
 }

@@ -1,5 +1,6 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
+use crate::game::Volatile;
 use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
 
@@ -18,7 +19,7 @@ impl Force {
             return Some(vector.normalize() * self.newton);
         }
 
-        return None;
+        None
     }
 }
 
@@ -58,6 +59,7 @@ fn mouse_button_input(
                     material: materials.add(ColorMaterial::from(Color::rgba(1.0, 0.0, 0.0, 0.5))),
                     ..default()
                 })
+                .insert(Volatile)
                 .id();
 
             commands
@@ -79,6 +81,7 @@ fn mouse_button_input(
                     ..Default::default()
                 })
                 .insert(Solid)
+                .insert(Volatile)
                 .push_children(&[force_field]);
         }
     }

@@ -2,10 +2,10 @@ use bevy::{prelude::*, time::FixedTimestep};
 use rand::Rng;
 
 use crate::force::Force;
+use crate::game::{GameState, Volatile};
 use crate::pathfinding::VectorField;
 use crate::physics::{Collider, ColliderBundle, Moving};
 use crate::sprite::AnimationTimer;
-use crate::tower::Tower;
 
 #[derive(Component)]
 struct Enemy;
@@ -25,10 +25,16 @@ impl Plugin for EnemySpawnerPlugin {
 
 fn spawn_enemy(
     mut commands: Commands,
+    game_state: Res<State<GameState>>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     windows: Res<Windows>,
 ) {
+    // TODO: find cleaner way to combine run criteria (FixedTimestep + state)
+    if *game_state.current() != GameState::InGame {
+        return;
+    }
+
     let window = windows.primary();
     let half_width = window.width() as f32 * 0.5;
     let half_height = window.height() as f32 * 0.5;
@@ -59,12 +65,13 @@ fn spawn_enemy(
             moving,
         })
         .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
-        .insert(Enemy);
+        .insert(Enemy)
+        .insert(Volatile);
 }
 
 fn turn_enemy(
-    mut force_query: Query<(&Force, &Transform), (With<Force>, Without<Tower>, Without<Enemy>)>,
-    mut enemy_query: Query<(&mut Moving, &Transform), (With<Enemy>, Without<Tower>)>,
+    mut force_query: Query<(&Force, &Transform), (With<Force>, Without<Enemy>)>,
+    mut enemy_query: Query<(&mut Moving, &Transform), With<Enemy>>,
     vector_field: Res<VectorField>,
     time: Res<Time>,
 ) {
