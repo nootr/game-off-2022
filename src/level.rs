@@ -1,16 +1,17 @@
 use bevy::prelude::*;
 
+use crate::game::{GameState, Volatile};
 use crate::physics::{Collider, Solid};
 
 pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(create_level);
+        app.add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_walls));
     }
 }
 
-fn create_level(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup_walls(mut commands: Commands, asset_server: Res<AssetServer>) {
     for y in 0..10 {
         commands
             .spawn_bundle(SpriteBundle {
@@ -25,6 +26,7 @@ fn create_level(mut commands: Commands, asset_server: Res<AssetServer>) {
             .insert(Collider {
                 ..Default::default()
             })
+            .insert(Volatile)
             .insert(Solid);
     }
     for x in 0..10 {
@@ -41,6 +43,7 @@ fn create_level(mut commands: Commands, asset_server: Res<AssetServer>) {
             .insert(Collider {
                 ..Default::default()
             })
+            .insert(Volatile)
             .insert(Solid);
         commands
             .spawn_bundle(SpriteBundle {
@@ -55,6 +58,7 @@ fn create_level(mut commands: Commands, asset_server: Res<AssetServer>) {
             .insert(Collider {
                 ..Default::default()
             })
+            .insert(Volatile)
             .insert(Solid);
     }
 }

@@ -13,7 +13,7 @@
 //! 4. Step 3 is repeated for each non-solid neighbouring Cell (first N/E/S/W, then diagonally).
 //!
 
-use bevy::{prelude::*, time::FixedTimestep};
+use bevy::{ecs::query::QuerySingleError, prelude::*, time::FixedTimestep};
 use log::debug;
 use rand::Rng;
 use std::{cmp, fmt};
@@ -58,10 +58,10 @@ impl fmt::Display for VectorField {
                     Some(Movement::UpRight) => s.push_str("↗️ "),
                     Some(Movement::DownLeft) => s.push_str("↙️ "),
                     Some(Movement::DownRight) => s.push_str("↘️ "),
-                    None => s.push_str("🟥"),
+                    None => s.push('🟥'),
                 }
             }
-            s.push_str("\n");
+            s.push('\n');
         }
 
         write!(f, "{}", &s)
@@ -244,17 +244,25 @@ fn update_vector_field(
     vector_field.reset();
 
     // Set tower flags
-    let (tower_collider, tower_transform) = tower_query.single();
-    let tower_upperleft = tower_transform.translation.truncate() - (tower_collider.hit_box / 1.8);
-    let tower_lowerright = tower_transform.translation.truncate() + (tower_collider.hit_box / 1.8);
+    match tower_query.get_single() {
+        Ok((tower_collider, tower_transform)) => {
+            let tower_upperleft =
+                tower_transform.translation.truncate() - (tower_collider.hit_box / 1.8);
+            let tower_lowerright =
+                tower_transform.translation.truncate() + (tower_collider.hit_box / 1.8);
 
-    let (rows, columns) = vector_field.get_region_indices(tower_upperleft, tower_lowerright);
-    for row in &rows {
-        for column in &columns {
-            let cell: &mut Cell = &mut vector_field.cells[*row][*column];
-            cell.solid = true;
-            cell.tower = true;
+            let (rows, columns) =
+                vector_field.get_region_indices(tower_upperleft, tower_lowerright);
+            for row in &rows {
+                for column in &columns {
+                    let cell: &mut Cell = &mut vector_field.cells[*row][*column];
+                    cell.solid = true;
+                    cell.tower = true;
+                }
+            }
         }
+        Err(QuerySingleError::NoEntities(_)) => {}
+        Err(QuerySingleError::MultipleEntities(_)) => error!("Multiple towers!"),
     }
 
     // Set solid flags

@@ -4,6 +4,8 @@ use bevy::{
 };
 use log::warn;
 
+use crate::game::GameState;
+
 #[derive(Component)]
 pub struct Solid;
 
@@ -59,7 +61,8 @@ pub struct PhysicsPlugin;
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(collision_system).add_system(move_system);
+        app.add_system_set(SystemSet::on_update(GameState::InGame).with_system(collision_system))
+            .add_system_set(SystemSet::on_update(GameState::InGame).with_system(move_system));
     }
 }
 
@@ -75,15 +78,10 @@ fn collision_system(
                 solid_transform.translation,
                 solid_collider.hit_box,
             ) {
-                // TODO: remove
                 if collider.hit {
                     warn!("Consecutive hits!");
-                }
-
-                if !collider.hit {
-                    if let Some(delta) = moving.last_delta {
-                        collider_transform.translation = collider_transform.translation - delta;
-                    }
+                } else if let Some(delta) = moving.last_delta {
+                    collider_transform.translation -= delta;
                 }
 
                 solid_collider.hit = true;

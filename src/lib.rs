@@ -1,16 +1,18 @@
+#![allow(clippy::type_complexity)]
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
-mod camera;
-mod enemies;
-mod force;
-mod game;
-mod level;
-mod pathfinding;
-mod physics;
-mod sprite;
-mod tower;
+pub mod camera;
+pub mod enemies;
+pub mod force;
+pub mod game;
+pub mod level;
+pub mod pathfinding;
+pub mod physics;
+pub mod sprite;
+pub mod tower;
+pub mod wave;
 use camera::CameraPlugin;
-use enemies::EnemySpawnerPlugin;
+use enemies::EnemyPlugin;
 use force::ForcePlugin;
 use game::GamePlugin;
 use level::LevelPlugin;
@@ -18,6 +20,7 @@ use pathfinding::VectorFieldPlugin;
 use physics::PhysicsPlugin;
 use sprite::SpritePlugin;
 use tower::TowerPlugin;
+use wave::WavePlugin;
 
 pub struct GamePlugins;
 
@@ -29,7 +32,8 @@ impl PluginGroup for GamePlugins {
             .add(VectorFieldPlugin)
             .add(SpritePlugin)
             .add(TowerPlugin)
-            .add(EnemySpawnerPlugin)
+            .add(EnemyPlugin)
+            .add(WavePlugin)
             .add(GamePlugin)
             .add(PhysicsPlugin)
             .add(ForcePlugin);

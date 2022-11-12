@@ -1,46 +1,73 @@
 use bevy::prelude::*;
+use std::time::Duration;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum GameState {
-    Running,
+    InGame,
+    Won,
     GameOver,
-    WaitingForInput,
 }
 
 #[derive(Component)]
-pub struct Game {
-    pub state: GameState,
+struct GameOverTimer {
+    timer: Timer,
 }
+
+/// Volatile entities are despawned after the GameOver state exits.
+#[derive(Component)]
+pub struct Volatile;
 
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup_game)
-            .add_system(game_over_system);
+        app.add_state(GameState::InGame)
+            .add_system_set(
+                SystemSet::on_enter(GameState::GameOver).with_system(set_game_over_timer),
+            )
+            .add_system_set(
+                SystemSet::on_update(GameState::GameOver).with_system(tick_game_over_timer),
+            )
+            .add_system_set(SystemSet::on_exit(GameState::GameOver).with_system(cleanup_volatile))
+            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(show_win_text));
     }
 }
 
-fn setup_game(mut commands: Commands) {
-    commands.insert_resource(Game {
-        state: GameState::Running,
+fn cleanup_volatile(mut commands: Commands, volatile_query: Query<Entity, With<Volatile>>) {
+    for entity in &volatile_query {
+        commands.entity(entity).despawn();
+    }
+}
+
+fn set_game_over_timer(mut commands: Commands) {
+    commands.spawn().insert(GameOverTimer {
+        timer: Timer::new(Duration::from_secs(1), false),
     });
 }
 
-fn game_over_system(
+fn tick_game_over_timer(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut game: ResMut<Game>,
+    mut game_state: ResMut<State<GameState>>,
+    mut q: Query<(Entity, &mut GameOverTimer)>,
+    time: Res<Time>,
 ) {
-    if game.state == GameState::GameOver {
-        game.state = GameState::WaitingForInput;
-        commands.spawn_bundle(TextBundle::from_section(
-            "GAME\nOVER",
-            TextStyle {
-                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                font_size: 100.0,
-                color: Color::RED,
-            },
-        ));
+    for (entity, mut timer) in q.iter_mut() {
+        timer.timer.tick(time.delta());
+
+        if timer.timer.finished() {
+            commands.entity(entity).despawn();
+            game_state.set(GameState::InGame).unwrap();
+        }
     }
+}
+
+fn show_win_text(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn_bundle(TextBundle::from_section(
+        "You've survived the day!",
+        TextStyle {
+            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+            font_size: 100.0,
+            color: Color::GREEN,
+        },
+    ));
 }
