@@ -14,7 +14,7 @@ impl Plugin for TowerPlugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_tower))
             .add_system_set(SystemSet::on_update(GameState::InGame).with_system(hit_tower))
-            .add_system_set(SystemSet::on_exit(GameState::InGame).with_system(remove_tower));
+            .add_system_set(SystemSet::on_enter(GameState::GameOver).with_system(remove_tower));
     }
 }
 

@@ -4,6 +4,7 @@ use std::time::Duration;
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum GameState {
     InGame,
+    Won,
     GameOver,
 }
 
@@ -27,7 +28,8 @@ impl Plugin for GamePlugin {
             .add_system_set(
                 SystemSet::on_update(GameState::GameOver).with_system(tick_game_over_timer),
             )
-            .add_system_set(SystemSet::on_exit(GameState::GameOver).with_system(cleanup_volatile));
+            .add_system_set(SystemSet::on_exit(GameState::GameOver).with_system(cleanup_volatile))
+            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(show_win_text));
     }
 }
 
@@ -57,4 +59,15 @@ fn tick_game_over_timer(
             game_state.set(GameState::InGame).unwrap();
         }
     }
+}
+
+fn show_win_text(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn_bundle(TextBundle::from_section(
+        "You've survived the day!",
+        TextStyle {
+            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+            font_size: 100.0,
+            color: Color::GREEN,
+        },
+    ));
 }
