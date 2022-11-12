@@ -1,15 +1,15 @@
 #![allow(clippy::type_complexity)]
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
-mod camera;
-mod enemies;
-mod force;
-mod game;
-mod level;
-mod pathfinding;
-mod physics;
-mod sprite;
-mod tower;
+pub mod camera;
+pub mod enemies;
+pub mod force;
+pub mod game;
+pub mod level;
+pub mod pathfinding;
+pub mod physics;
+pub mod sprite;
+pub mod tower;
 use camera::CameraPlugin;
 use enemies::EnemySpawnerPlugin;
 use force::ForcePlugin;

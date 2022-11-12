@@ -1,3 +1,9 @@
+//! A Bevy plugin for a camera with a shake feature.
+//!
+//! The shaking algorithm is based on [an excellent presentation by Squirrel
+//! Eiserloh](https://www.youtube.com/watch?v=tu-Qe66AvtY).
+//!
+
 use bevy::{prelude::*, render::texture::ImageSettings};
 use rand::Rng;
 
