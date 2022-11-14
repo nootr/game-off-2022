@@ -3,6 +3,7 @@ use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use crate::game::Volatile;
 use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
+use crate::ui::UIBar;
 
 #[derive(Component)]
 pub struct Force {
@@ -39,8 +40,13 @@ fn mouse_button_input(
     windows: Res<Windows>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    uibar_query: Query<&Node, With<UIBar>>,
 ) {
+    let uibar = uibar_query.single();
+
     let window = windows.primary();
+    let window_width = window.width();
+    let window_height = window.height();
 
     if buttons.just_released(MouseButton::Left) {
         if let Some(raw_position) = window.cursor_position() {
@@ -49,7 +55,12 @@ fn mouse_button_input(
                 TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-            let position = raw_position - Vec2::new(window.width(), window.height()) / 2.0;
+            let position = raw_position - Vec2::new(window_width, window_height) / 2.0;
+
+            if raw_position.x < uibar.size().x {
+                // Do not summon a force within the UI bar.
+                return;
+            }
 
             let influence = 50.0;
 
@@ -66,7 +77,7 @@ fn mouse_button_input(
                 .spawn(SpriteSheetBundle {
                     texture_atlas: texture_atlas_handle,
                     transform: Transform {
-                        translation: position.extend(0.0),
+                        translation: position.extend(-1.0),
                         scale: Vec3::splat(4.0),
                         ..default()
                     },
@@ -80,7 +91,7 @@ fn mouse_button_input(
                     newton: 500.0,
                     influence,
                 })
-                .insert(Collider { ..default() })
+                .insert(Collider::default())
                 .insert(Solid)
                 .insert(Volatile)
                 .push_children(&[force_field]);
