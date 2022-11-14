@@ -4,11 +4,13 @@ use game_off_2022::GamePlugins;
 
 fn main() {
     App::new()
-        .insert_resource(WindowDescriptor {
-            title: "Trumpet Trainee".to_string(),
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
+                title: "Trumpet Trainee".to_string(),
+                ..default()
+            },
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .add_plugins(GamePlugins)
         .run();
 }

@@ -4,7 +4,7 @@
 //! Eiserloh](https://www.youtube.com/watch?v=tu-Qe66AvtY).
 //!
 
-use bevy::{prelude::*, render::texture::ImageSettings};
+use bevy::prelude::*;
 use rand::Rng;
 
 #[derive(Debug, Component)]
@@ -28,15 +28,14 @@ pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(ImageSettings::default_nearest()) // prevents blurry sprites
-            .add_startup_system(setup_camera)
+        app.add_startup_system(setup_camera)
             .add_system(shake_camera);
     }
 }
 
 fn setup_camera(mut commands: Commands) {
     commands
-        .spawn_bundle(Camera2dBundle::default())
+        .spawn(Camera2dBundle::default())
         .insert(CameraShake::default());
 }
 

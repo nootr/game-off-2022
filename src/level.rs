@@ -14,7 +14,7 @@ impl Plugin for LevelPlugin {
 fn setup_walls(mut commands: Commands, asset_server: Res<AssetServer>) {
     for y in 0..10 {
         commands
-            .spawn_bundle(SpriteBundle {
+            .spawn(SpriteBundle {
                 texture: asset_server.load("sprites/wall.png"),
                 transform: Transform {
                     translation: Vec3::new(-300.0, (y as f32 - 5.0) * 40.0, 0.0),
@@ -23,15 +23,13 @@ fn setup_walls(mut commands: Commands, asset_server: Res<AssetServer>) {
                 },
                 ..default()
             })
-            .insert(Collider {
-                ..Default::default()
-            })
+            .insert(Collider { ..default() })
             .insert(Volatile)
             .insert(Solid);
     }
     for x in 0..10 {
         commands
-            .spawn_bundle(SpriteBundle {
+            .spawn(SpriteBundle {
                 texture: asset_server.load("sprites/wall.png"),
                 transform: Transform {
                     translation: Vec3::new(-300.0 + 50.0 * (x as f32), -210.0, 0.0),
@@ -40,13 +38,11 @@ fn setup_walls(mut commands: Commands, asset_server: Res<AssetServer>) {
                 },
                 ..default()
             })
-            .insert(Collider {
-                ..Default::default()
-            })
+            .insert(Collider { ..default() })
             .insert(Volatile)
             .insert(Solid);
         commands
-            .spawn_bundle(SpriteBundle {
+            .spawn(SpriteBundle {
                 texture: asset_server.load("sprites/wall.png"),
                 transform: Transform {
                     translation: Vec3::new(-300.0 + 50.0 * (x as f32), 200.0, 0.0),
@@ -55,9 +51,7 @@ fn setup_walls(mut commands: Commands, asset_server: Res<AssetServer>) {
                 },
                 ..default()
             })
-            .insert(Collider {
-                ..Default::default()
-            })
+            .insert(Collider { ..default() })
             .insert(Volatile)
             .insert(Solid);
     }

@@ -46,7 +46,7 @@ impl Moving {
         Moving {
             velocity,
             speed: velocity.length(),
-            ..Default::default()
+            ..default()
         }
     }
 }

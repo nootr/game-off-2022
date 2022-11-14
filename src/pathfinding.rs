@@ -36,7 +36,7 @@ enum Movement {
     DownLeft,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Resource)]
 pub struct VectorField {
     cells: [[Cell; GRID_COLUMNS]; GRID_ROWS],
     width: f32,

@@ -25,8 +25,8 @@ use wave::WavePlugin;
 pub struct GamePlugins;
 
 impl PluginGroup for GamePlugins {
-    fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group
+    fn build(self) -> PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>()
             .add(CameraPlugin)
             .add(LevelPlugin)
             .add(VectorFieldPlugin)
@@ -36,6 +36,6 @@ impl PluginGroup for GamePlugins {
             .add(WavePlugin)
             .add(GamePlugin)
             .add(PhysicsPlugin)
-            .add(ForcePlugin);
+            .add(ForcePlugin)
     }
 }

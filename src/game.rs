@@ -40,8 +40,8 @@ fn cleanup_volatile(mut commands: Commands, volatile_query: Query<Entity, With<V
 }
 
 fn set_game_over_timer(mut commands: Commands) {
-    commands.spawn().insert(GameOverTimer {
-        timer: Timer::new(Duration::from_secs(1), false),
+    commands.spawn(GameOverTimer {
+        timer: Timer::new(Duration::from_secs(1), TimerMode::Once),
     });
 }
 
@@ -62,7 +62,7 @@ fn tick_game_over_timer(
 }
 
 fn show_win_text(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn_bundle(TextBundle::from_section(
+    commands.spawn(TextBundle::from_section(
         "You've survived the day!",
         TextStyle {
             font: asset_server.load("fonts/FiraSans-Bold.ttf"),

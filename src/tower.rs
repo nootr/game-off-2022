@@ -24,23 +24,27 @@ fn setup_tower(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     let texture_handle = asset_server.load("sprites/tower.png");
-    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1);
+    let texture_atlas =
+        TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     commands
-        .spawn_bundle(SpriteSheetBundle {
+        .spawn(SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             transform: Transform::from_scale(Vec3::splat(4.0)),
             ..default()
         })
-        .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
+        .insert(AnimationTimer(Timer::from_seconds(
+            0.1,
+            TimerMode::Repeating,
+        )))
         .insert(Tower)
-        .insert_bundle(ColliderBundle {
+        .insert(ColliderBundle {
             collider: Collider {
                 hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
-                ..Default::default()
+                ..default()
             },
-            ..Default::default()
+            ..default()
         })
         .insert(Solid)
         .insert(Volatile);

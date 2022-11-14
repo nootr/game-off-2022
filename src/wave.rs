@@ -11,7 +11,7 @@ pub struct EnemySpawn {
     pub spawn_time: f32,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Resource)]
 struct EnemySpawnQueue {
     pub enemies: Vec<EnemySpawn>,
 }
@@ -59,7 +59,7 @@ fn tick_wave(
 
             let texture_handle = asset_server.load("sprites/enemy.png");
             let texture_atlas =
-                TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1);
+                TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
             let height: f32 = rand::thread_rng().gen_range(-half_height..half_height);
@@ -67,7 +67,7 @@ fn tick_wave(
             let moving = Moving::new(Vec3::new(300.0, 0.0, 0.0));
 
             commands
-                .spawn_bundle(SpriteSheetBundle {
+                .spawn(SpriteSheetBundle {
                     texture_atlas: texture_atlas_handle,
                     transform: Transform {
                         translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
@@ -76,14 +76,17 @@ fn tick_wave(
                     },
                     ..default()
                 })
-                .insert_bundle(ColliderBundle {
+                .insert(ColliderBundle {
                     collider: Collider {
                         hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
-                        ..Default::default()
+                        ..default()
                     },
                     moving,
                 })
-                .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
+                .insert(AnimationTimer(Timer::from_seconds(
+                    0.1,
+                    TimerMode::Repeating,
+                )))
                 .insert(Enemy)
                 .insert(Volatile);
 

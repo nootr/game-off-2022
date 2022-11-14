@@ -46,7 +46,7 @@ fn mouse_button_input(
         if let Some(raw_position) = window.cursor_position() {
             let texture_handle = asset_server.load("sprites/turret.png");
             let texture_atlas =
-                TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1);
+                TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
             let position = raw_position - Vec2::new(window.width(), window.height()) / 2.0;
@@ -54,7 +54,7 @@ fn mouse_button_input(
             let influence = 50.0;
 
             let force_field = commands
-                .spawn_bundle(MaterialMesh2dBundle {
+                .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(Mesh::from(shape::Circle::new(influence))).into(),
                     material: materials.add(ColorMaterial::from(Color::rgba(1.0, 0.0, 0.0, 0.5))),
                     ..default()
@@ -63,7 +63,7 @@ fn mouse_button_input(
                 .id();
 
             commands
-                .spawn_bundle(SpriteSheetBundle {
+                .spawn(SpriteSheetBundle {
                     texture_atlas: texture_atlas_handle,
                     transform: Transform {
                         translation: position.extend(0.0),
@@ -72,14 +72,15 @@ fn mouse_button_input(
                     },
                     ..default()
                 })
-                .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
+                .insert(AnimationTimer(Timer::from_seconds(
+                    0.1,
+                    TimerMode::Repeating,
+                )))
                 .insert(Force {
                     newton: 500.0,
                     influence,
                 })
-                .insert(Collider {
-                    ..Default::default()
-                })
+                .insert(Collider { ..default() })
                 .insert(Solid)
                 .insert(Volatile)
                 .push_children(&[force_field]);
