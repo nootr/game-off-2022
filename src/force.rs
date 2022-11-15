@@ -16,7 +16,7 @@ pub enum ForceType {
 pub struct Force {
     pub newton: f32,
     pub influence: f32,
-    force_type: ForceType,
+    pub force_type: ForceType,
 }
 
 impl Force {
@@ -31,7 +31,7 @@ impl Force {
 
         let distance = vector.length() / 4.0;
 
-        if distance < self.influence {
+        if 0.0 < distance && distance < self.influence {
             Some(vector.normalize() * self.newton)
         } else {
             None

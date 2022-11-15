@@ -16,7 +16,7 @@ impl Plugin for EnemyPlugin {
 }
 
 fn turn_enemy(
-    mut force_query: Query<(&Force, &Transform), (With<Force>, Without<Enemy>)>,
+    mut force_query: Query<(&Force, &Transform)>,
     mut enemy_query: Query<(&mut Moving, &Transform), With<Enemy>>,
     vector_field: Res<VectorField>,
     time: Res<Time>,

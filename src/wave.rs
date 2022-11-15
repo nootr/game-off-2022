@@ -1,16 +1,32 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use rand::Rng;
 
 use crate::enemies::Enemy;
+use crate::force::{Force, ForceType};
 use crate::game::{GameState, Volatile};
 use crate::physics::{Collider, ColliderBundle, Moving};
 use crate::sprite::AnimationTimer;
 
-struct EnemySpawnEvent;
+struct EnemySpawnEvent {
+    influence: f32,
+    force_type: ForceType,
+}
 
 #[derive(Clone, Copy, Debug)]
 pub struct EnemySpawn {
     pub spawn_time: f32,
+    influence: f32,
+    force_type: ForceType,
+}
+
+impl Default for EnemySpawn {
+    fn default() -> Self {
+        EnemySpawn {
+            spawn_time: 0.0,
+            influence: 50.0,
+            force_type: ForceType::Passive,
+        }
+    }
 }
 
 #[derive(Debug, Default, Resource)]
@@ -32,10 +48,32 @@ impl Plugin for WavePlugin {
 }
 
 fn setup_wave(mut enemy_queue: ResMut<EnemySpawnQueue>) {
-    enemy_queue.enemies.push(EnemySpawn { spawn_time: 1.0 });
-    enemy_queue.enemies.push(EnemySpawn { spawn_time: 2.0 });
-    enemy_queue.enemies.push(EnemySpawn { spawn_time: 2.5 });
-    enemy_queue.enemies.push(EnemySpawn { spawn_time: 10.0 });
+    enemy_queue.enemies.push(EnemySpawn {
+        spawn_time: 1.0,
+        ..default()
+    });
+    enemy_queue.enemies.push(EnemySpawn {
+        spawn_time: 2.0,
+        ..default()
+    });
+    enemy_queue.enemies.push(EnemySpawn {
+        spawn_time: 2.5,
+        force_type: ForceType::Repel,
+        ..default()
+    });
+    enemy_queue.enemies.push(EnemySpawn {
+        spawn_time: 10.0,
+        ..default()
+    });
+    enemy_queue.enemies.push(EnemySpawn {
+        spawn_time: 13.0,
+        force_type: ForceType::Attract,
+        ..default()
+    });
+    enemy_queue.enemies.push(EnemySpawn {
+        spawn_time: 20.0,
+        ..default()
+    });
 }
 
 fn tick_wave(
@@ -53,7 +91,10 @@ fn tick_wave(
     enemy_queue.enemies.retain_mut(|enemy_spawn| {
         enemy_spawn.spawn_time -= time_delta;
         if enemy_spawn.spawn_time < 0.0 {
-            ev_spawn_enemy.send(EnemySpawnEvent);
+            ev_spawn_enemy.send(EnemySpawnEvent {
+                influence: enemy_spawn.influence,
+                force_type: enemy_spawn.force_type,
+            });
 
             false
         } else {
@@ -68,8 +109,10 @@ fn spawn_enemy(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     windows: Res<Windows>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    for _ev in ev_spawn_enemy.iter() {
+    for ev in ev_spawn_enemy.iter() {
         let window = windows.primary();
         let half_width = window.width() as f32 * 0.5;
         let half_height = window.height() as f32 * 0.5;
@@ -82,6 +125,21 @@ fn spawn_enemy(
         let height: f32 = rand::thread_rng().gen_range(-half_height..half_height);
 
         let moving = Moving::new(Vec3::new(300.0, 0.0, 0.0));
+
+        let force_field = commands
+            .spawn(MaterialMesh2dBundle {
+                mesh: meshes
+                    .add(Mesh::from(shape::Circle::new(ev.influence)))
+                    .into(),
+                material: materials.add(ColorMaterial::from(match ev.force_type {
+                    ForceType::Passive => Color::rgba(0.0, 0.0, 0.0, 0.0),
+                    ForceType::Attract => Color::rgba(1.0, 0.0, 0.0, 0.5),
+                    ForceType::Repel => Color::rgba(0.0, 0.0, 1.0, 0.5),
+                })),
+                ..default()
+            })
+            .insert(Volatile)
+            .id();
 
         commands
             .spawn(SpriteSheetBundle {
@@ -105,7 +163,13 @@ fn spawn_enemy(
                 TimerMode::Repeating,
             )))
             .insert(Enemy)
-            .insert(Volatile);
+            .insert(Volatile)
+            .insert(Force {
+                newton: 500.0,
+                influence: ev.influence,
+                force_type: ev.force_type,
+            })
+            .push_children(&[force_field]);
     }
 }
 
