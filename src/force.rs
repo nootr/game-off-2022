@@ -5,22 +5,39 @@ use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
 use crate::ui::UIBar;
 
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum ForceType {
+    Passive,
+    Attract,
+    Repel,
+}
+
 #[derive(Component)]
 pub struct Force {
     pub newton: f32,
     pub influence: f32,
+    force_type: ForceType,
 }
 
 impl Force {
     pub fn get_force(&self, position: Vec3, force_position: Vec3) -> Option<Vec3> {
-        let vector = force_position - position;
+        let mut vector = match self.force_type {
+            ForceType::Attract => force_position - position,
+            ForceType::Repel => position - force_position,
+            ForceType::Passive => {
+                return None;
+            }
+        };
+        vector.z = 0.0;
+        // TODO: vind goede plek om z op nul te houden (misschien Vec2 als inputs?)
+
         let distance = vector.length() / 4.0;
 
         if distance < self.influence {
-            return Some(vector.normalize() * self.newton);
+            Some(vector.normalize() * self.newton)
+        } else {
+            None
         }
-
-        None
     }
 }
 
@@ -40,9 +57,9 @@ fn mouse_button_input(
     windows: Res<Windows>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    uibar_query: Query<&Node, With<UIBar>>,
+    uibar_query: Query<(&UIBar, &Node), With<UIBar>>,
 ) {
-    let uibar = uibar_query.single();
+    let (uibar, uibar_node) = uibar_query.single();
 
     let window = windows.primary();
     let window_width = window.width();
@@ -57,17 +74,22 @@ fn mouse_button_input(
 
             let position = raw_position - Vec2::new(window_width, window_height) / 2.0;
 
-            if raw_position.x < uibar.size().x {
+            if raw_position.x < uibar_node.size().x {
                 // Do not summon a force within the UI bar.
                 return;
             }
 
             let influence = 50.0;
+            let force_type = uibar.selected_force;
 
             let force_field = commands
                 .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(Mesh::from(shape::Circle::new(influence))).into(),
-                    material: materials.add(ColorMaterial::from(Color::rgba(1.0, 0.0, 0.0, 0.5))),
+                    material: materials.add(ColorMaterial::from(match force_type {
+                        ForceType::Passive => Color::rgba(0.0, 0.0, 0.0, 0.0),
+                        ForceType::Attract => Color::rgba(1.0, 0.0, 0.0, 0.5),
+                        ForceType::Repel => Color::rgba(0.0, 0.0, 1.0, 0.5),
+                    })),
                     ..default()
                 })
                 .insert(Volatile)
@@ -90,6 +112,7 @@ fn mouse_button_input(
                 .insert(Force {
                     newton: 500.0,
                     influence,
+                    force_type,
                 })
                 .insert(Collider::default())
                 .insert(Solid)
