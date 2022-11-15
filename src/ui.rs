@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::force::ForceType;
+use crate::game::GameState;
 
 const PASSIVE_COLOR: Color = Color::rgb(0.0, 0.65, 0.0);
 const ATTRACT_COLOR: Color = Color::rgb(0.65, 0.0, 0.0);
@@ -52,43 +53,8 @@ pub struct UIPlugin;
 impl Plugin for UIPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup)
-            .add_system(click_button)
-            .add_system(button_color);
-    }
-}
-
-fn click_button(
-    mut interaction_query: Query<
-        (&mut ForceButton, &Interaction),
-        (Changed<Interaction>, With<Button>),
-    >,
-    mut uibar_query: Query<&mut UIBar>,
-) {
-    let mut uibar = uibar_query.single_mut();
-
-    for (mut force_button, interaction) in &mut interaction_query {
-        match *interaction {
-            Interaction::Clicked => {
-                uibar.selected_force = force_button.force_type;
-            }
-            Interaction::Hovered => {
-                force_button.hovered = true;
-            }
-            Interaction::None => {
-                force_button.hovered = false;
-            }
-        }
-    }
-}
-
-fn button_color(
-    mut button_query: Query<(&ForceButton, &mut BackgroundColor)>,
-    mut uibar_query: Query<&mut UIBar>,
-) {
-    let mut uibar = uibar_query.single_mut();
-
-    for (force_button, mut color) in &mut button_query {
-        *color = force_button.color(&mut uibar).into();
+            .add_system_set(SystemSet::on_update(GameState::InGame).with_system(click_button))
+            .add_system_set(SystemSet::on_update(GameState::InGame).with_system(button_color));
     }
 }
 
@@ -176,4 +142,39 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
         .insert(UIBar {
             selected_force: ForceType::Passive,
         });
+}
+
+fn click_button(
+    mut interaction_query: Query<
+        (&mut ForceButton, &Interaction),
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut uibar_query: Query<&mut UIBar>,
+) {
+    let mut uibar = uibar_query.single_mut();
+
+    for (mut force_button, interaction) in &mut interaction_query {
+        match *interaction {
+            Interaction::Clicked => {
+                uibar.selected_force = force_button.force_type;
+            }
+            Interaction::Hovered => {
+                force_button.hovered = true;
+            }
+            Interaction::None => {
+                force_button.hovered = false;
+            }
+        }
+    }
+}
+
+fn button_color(
+    mut button_query: Query<(&ForceButton, &mut BackgroundColor)>,
+    mut uibar_query: Query<&mut UIBar>,
+) {
+    let mut uibar = uibar_query.single_mut();
+
+    for (force_button, mut color) in &mut button_query {
+        *color = force_button.color(&mut uibar).into();
+    }
 }

@@ -1,6 +1,6 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
-use crate::game::Volatile;
+use crate::game::{GameState, Volatile};
 use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
 use crate::ui::UIBar;
@@ -20,16 +20,14 @@ pub struct Force {
 }
 
 impl Force {
-    pub fn get_force(&self, position: Vec3, force_position: Vec3) -> Option<Vec3> {
-        let mut vector = match self.force_type {
+    pub fn get_force(&self, position: Vec2, force_position: Vec2) -> Option<Vec2> {
+        let vector = match self.force_type {
             ForceType::Attract => force_position - position,
             ForceType::Repel => position - force_position,
             ForceType::Passive => {
                 return None;
             }
         };
-        vector.z = 0.0;
-        // TODO: vind goede plek om z op nul te houden (misschien Vec2 als inputs?)
 
         let distance = vector.length() / 4.0;
 
@@ -45,7 +43,7 @@ pub struct ForcePlugin;
 
 impl Plugin for ForcePlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(mouse_button_input);
+        app.add_system_set(SystemSet::on_update(GameState::InGame).with_system(mouse_button_input));
     }
 }
 

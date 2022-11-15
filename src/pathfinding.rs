@@ -69,22 +69,22 @@ impl fmt::Display for VectorField {
 }
 
 impl VectorField {
-    pub fn get_direction(&self, from: Vec3) -> Vec3 {
+    pub fn get_direction(&self, from: Vec2) -> Vec2 {
         let mut rng = rand::thread_rng();
 
-        let (row, column) = self.position_to_index(from.truncate());
+        let (row, column) = self.position_to_index(from);
         let cell: &Cell = &self.cells[row][column];
 
         match &cell.movement {
-            Some(Movement::Up) => Vec3::new(0.0, -1.0, 0.0),
-            Some(Movement::Down) => Vec3::new(0.0, 1.0, 0.0),
-            Some(Movement::Left) => Vec3::new(-1.0, 0.0, 0.0),
-            Some(Movement::Right) => Vec3::new(1.0, 0.0, 0.0),
-            Some(Movement::UpRight) => Vec3::new(0.7, -0.7, 0.0),
-            Some(Movement::UpLeft) => Vec3::new(-0.7, -0.7, 0.0),
-            Some(Movement::DownRight) => Vec3::new(0.7, 0.7, 0.0),
-            Some(Movement::DownLeft) => Vec3::new(-0.7, 0.7, 0.0),
-            None => Vec3::new(rng.gen_range(-0.7..0.7), rng.gen_range(-0.7..0.7), 0.0),
+            Some(Movement::Up) => Vec2::new(0.0, -1.0),
+            Some(Movement::Down) => Vec2::new(0.0, 1.0),
+            Some(Movement::Left) => Vec2::new(-1.0, 0.0),
+            Some(Movement::Right) => Vec2::new(1.0, 0.0),
+            Some(Movement::UpRight) => Vec2::new(0.7, -0.7),
+            Some(Movement::UpLeft) => Vec2::new(-0.7, -0.7),
+            Some(Movement::DownRight) => Vec2::new(0.7, 0.7),
+            Some(Movement::DownLeft) => Vec2::new(-0.7, 0.7),
+            None => Vec2::new(rng.gen_range(-0.7..0.7), rng.gen_range(-0.7..0.7)),
         }
     }
 
