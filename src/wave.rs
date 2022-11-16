@@ -126,16 +126,18 @@ fn spawn_enemy(
 
         let moving = Moving::new(Vec3::new(300.0, 0.0, 0.0));
 
+        let mut color = Color::from(ev.force_type);
+        color.set_a(match ev.force_type {
+            ForceType::Passive => 0.0,
+            _ => 0.5,
+        });
+
         let force_field = commands
             .spawn(MaterialMesh2dBundle {
                 mesh: meshes
                     .add(Mesh::from(shape::Circle::new(ev.influence)))
                     .into(),
-                material: materials.add(ColorMaterial::from(match ev.force_type {
-                    ForceType::Passive => Color::rgba(0.0, 0.0, 0.0, 0.0),
-                    ForceType::Attract => Color::rgba(1.0, 0.0, 0.0, 0.5),
-                    ForceType::Repel => Color::rgba(0.0, 0.0, 1.0, 0.5),
-                })),
+                material: materials.add(ColorMaterial::from(color)),
                 ..default()
             })
             .insert(Volatile)

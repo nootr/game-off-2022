@@ -3,10 +3,6 @@ use bevy::prelude::*;
 use crate::force::ForceType;
 use crate::game::GameState;
 
-const PASSIVE_COLOR: Color = Color::rgb(0.0, 0.65, 0.0);
-const ATTRACT_COLOR: Color = Color::rgb(0.65, 0.0, 0.0);
-const REPEL_COLOR: Color = Color::rgb(0.0, 0.0, 0.65);
-
 #[derive(Component)]
 pub struct UIBar {
     pub selected_force: ForceType,
@@ -19,16 +15,8 @@ struct ForceButton {
 }
 
 impl ForceButton {
-    fn base_color(&self) -> Color {
-        match self.force_type {
-            ForceType::Passive => PASSIVE_COLOR,
-            ForceType::Attract => ATTRACT_COLOR,
-            ForceType::Repel => REPEL_COLOR,
-        }
-    }
-
     fn color(&self, uibar: &mut UIBar) -> Color {
-        let mut color = self.base_color();
+        let mut color: Color = self.force_type.into();
         color.set_a(self.alpha(&uibar));
         color
     }
@@ -91,53 +79,65 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
             ..default()
         })
         .with_children(|bar| {
-            bar.spawn(create_ui_button(bar_width, bar_height / 3.0, PASSIVE_COLOR))
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Passive",
-                        TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                            font_size: 30.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                        },
-                    ));
-                })
-                .insert(ForceButton {
-                    force_type: ForceType::Passive,
-                    hovered: false,
-                });
+            bar.spawn(create_ui_button(
+                bar_width,
+                bar_height / 3.0,
+                ForceType::Passive.into(),
+            ))
+            .with_children(|parent| {
+                parent.spawn(TextBundle::from_section(
+                    "Passive",
+                    TextStyle {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 30.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            })
+            .insert(ForceButton {
+                force_type: ForceType::Passive,
+                hovered: false,
+            });
 
-            bar.spawn(create_ui_button(bar_width, bar_height / 3.0, ATTRACT_COLOR))
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Attract",
-                        TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                            font_size: 30.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                        },
-                    ));
-                })
-                .insert(ForceButton {
-                    force_type: ForceType::Attract,
-                    hovered: false,
-                });
+            bar.spawn(create_ui_button(
+                bar_width,
+                bar_height / 3.0,
+                ForceType::Attract.into(),
+            ))
+            .with_children(|parent| {
+                parent.spawn(TextBundle::from_section(
+                    "Attract",
+                    TextStyle {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 30.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            })
+            .insert(ForceButton {
+                force_type: ForceType::Attract,
+                hovered: false,
+            });
 
-            bar.spawn(create_ui_button(bar_width, bar_height / 3.0, REPEL_COLOR))
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Repel",
-                        TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                            font_size: 30.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                        },
-                    ));
-                })
-                .insert(ForceButton {
-                    force_type: ForceType::Repel,
-                    hovered: false,
-                });
+            bar.spawn(create_ui_button(
+                bar_width,
+                bar_height / 3.0,
+                ForceType::Repel.into(),
+            ))
+            .with_children(|parent| {
+                parent.spawn(TextBundle::from_section(
+                    "Repel",
+                    TextStyle {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 30.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            })
+            .insert(ForceButton {
+                force_type: ForceType::Repel,
+                hovered: false,
+            });
         })
         .insert(UIBar {
             selected_force: ForceType::Passive,

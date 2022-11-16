@@ -5,11 +5,25 @@ use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
 use crate::ui::UIBar;
 
+const PASSIVE_COLOR: Color = Color::rgb(0.0, 0.65, 0.0);
+const ATTRACT_COLOR: Color = Color::rgb(0.65, 0.0, 0.0);
+const REPEL_COLOR: Color = Color::rgb(0.0, 0.0, 0.65);
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum ForceType {
     Passive,
     Attract,
     Repel,
+}
+
+impl From<ForceType> for Color {
+    fn from(force_type: ForceType) -> Self {
+        match force_type {
+            ForceType::Passive => PASSIVE_COLOR,
+            ForceType::Attract => ATTRACT_COLOR,
+            ForceType::Repel => REPEL_COLOR,
+        }
+    }
 }
 
 #[derive(Component)]
@@ -80,14 +94,16 @@ fn mouse_button_input(
             let influence = 50.0;
             let force_type = uibar.selected_force;
 
+            let mut color = Color::from(force_type);
+            color.set_a(match force_type {
+                ForceType::Passive => 0.0,
+                _ => 0.5,
+            });
+
             let force_field = commands
                 .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(Mesh::from(shape::Circle::new(influence))).into(),
-                    material: materials.add(ColorMaterial::from(match force_type {
-                        ForceType::Passive => Color::rgba(0.0, 0.0, 0.0, 0.0),
-                        ForceType::Attract => Color::rgba(1.0, 0.0, 0.0, 0.5),
-                        ForceType::Repel => Color::rgba(0.0, 0.0, 1.0, 0.5),
-                    })),
+                    material: materials.add(ColorMaterial::from(color)),
                     ..default()
                 })
                 .insert(Volatile)
