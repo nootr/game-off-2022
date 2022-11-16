@@ -31,7 +31,8 @@ fn setup_tower(
     commands
         .spawn(SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
-            transform: Transform::from_scale(Vec3::splat(4.0)),
+            transform: Transform::from_scale(Vec3::splat(4.0))
+                .with_translation(Vec3::new(0.0, 0.0, -1.0)),
             ..default()
         })
         .insert(AnimationTimer(Timer::from_seconds(

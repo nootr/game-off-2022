@@ -10,6 +10,7 @@ pub mod pathfinding;
 pub mod physics;
 pub mod sprite;
 pub mod tower;
+pub mod ui;
 pub mod wave;
 use camera::CameraPlugin;
 use enemies::EnemyPlugin;
@@ -20,6 +21,7 @@ use pathfinding::VectorFieldPlugin;
 use physics::PhysicsPlugin;
 use sprite::SpritePlugin;
 use tower::TowerPlugin;
+use ui::UIPlugin;
 use wave::WavePlugin;
 
 pub struct GamePlugins;
@@ -28,6 +30,7 @@ impl PluginGroup for GamePlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(CameraPlugin)
+            .add(UIPlugin)
             .add(LevelPlugin)
             .add(VectorFieldPlugin)
             .add(SpritePlugin)
