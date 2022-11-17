@@ -3,6 +3,8 @@ use std::time::Duration;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum GameState {
+    MainMenu,
+    Start,
     InGame,
     Won,
     GameOver,
@@ -21,7 +23,7 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_state(GameState::InGame)
+        app.add_state(GameState::MainMenu)
             .add_system_set(
                 SystemSet::on_enter(GameState::GameOver).with_system(set_game_over_timer),
             )
@@ -65,7 +67,7 @@ fn show_win_text(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(TextBundle::from_section(
         "You've survived the day!",
         TextStyle {
-            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+            font: asset_server.load("fonts/PixeloidSans.ttf"),
             font_size: 100.0,
             color: Color::GREEN,
         },

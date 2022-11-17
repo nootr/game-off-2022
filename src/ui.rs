@@ -40,9 +40,10 @@ pub struct UIPlugin;
 
 impl Plugin for UIPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup)
+        app.add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup))
             .add_system_set(SystemSet::on_update(GameState::InGame).with_system(click_button))
-            .add_system_set(SystemSet::on_update(GameState::InGame).with_system(button_color));
+            .add_system_set(SystemSet::on_update(GameState::InGame).with_system(button_color))
+            .add_system_set(SystemSet::on_exit(GameState::InGame).with_system(cleanup_uibar));
     }
 }
 
@@ -88,7 +89,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 parent.spawn(TextBundle::from_section(
                     "Passive",
                     TextStyle {
-                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font: asset_server.load("fonts/PixeloidSans.ttf"),
                         font_size: 30.0,
                         color: Color::rgb(0.9, 0.9, 0.9),
                     },
@@ -108,7 +109,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 parent.spawn(TextBundle::from_section(
                     "Attract",
                     TextStyle {
-                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font: asset_server.load("fonts/PixeloidSans.ttf"),
                         font_size: 30.0,
                         color: Color::rgb(0.9, 0.9, 0.9),
                     },
@@ -128,7 +129,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 parent.spawn(TextBundle::from_section(
                     "Repel",
                     TextStyle {
-                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font: asset_server.load("fonts/PixeloidSans.ttf"),
                         font_size: 30.0,
                         color: Color::rgb(0.9, 0.9, 0.9),
                     },
@@ -177,4 +178,9 @@ fn button_color(
     for (force_button, mut color) in &mut button_query {
         *color = force_button.color(&mut uibar).into();
     }
+}
+
+fn cleanup_uibar(mut commands: Commands, uibar_query: Query<Entity, With<UIBar>>) {
+    let uibar = uibar_query.single();
+    commands.entity(uibar).despawn_recursive();
 }
