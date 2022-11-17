@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::WorldInspectorPlugin;
 
 use game_off_2022::GamePlugins;
 
@@ -12,5 +13,6 @@ fn main() {
             ..default()
         }))
         .add_plugins(GamePlugins)
+        .add_plugin(WorldInspectorPlugin::new())
         .run();
 }
