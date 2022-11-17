@@ -6,6 +6,7 @@ pub mod enemies;
 pub mod force;
 pub mod game;
 pub mod level;
+pub mod menu;
 pub mod pathfinding;
 pub mod physics;
 pub mod sprite;
@@ -17,6 +18,7 @@ use enemies::EnemyPlugin;
 use force::ForcePlugin;
 use game::GamePlugin;
 use level::LevelPlugin;
+use menu::MenuPlugin;
 use pathfinding::VectorFieldPlugin;
 use physics::PhysicsPlugin;
 use sprite::SpritePlugin;
@@ -31,6 +33,7 @@ impl PluginGroup for GamePlugins {
         PluginGroupBuilder::start::<Self>()
             .add(CameraPlugin)
             .add(UIPlugin)
+            .add(MenuPlugin)
             .add(LevelPlugin)
             .add(VectorFieldPlugin)
             .add(SpritePlugin)

@@ -23,7 +23,7 @@ impl Default for EnemySpawn {
     fn default() -> Self {
         EnemySpawn {
             spawn_time: 0.0,
-            influence: 50.0,
+            influence: 80.0,
             force_type: ForceType::Passive,
         }
     }
@@ -49,29 +49,29 @@ impl Plugin for WavePlugin {
 
 fn setup_wave(mut enemy_queue: ResMut<EnemySpawnQueue>) {
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 1.0,
+        spawn_time: 4.0,
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 2.0,
+        spawn_time: 5.0,
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 2.5,
+        spawn_time: 9.0,
         force_type: ForceType::Repel,
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 10.0,
+        spawn_time: 13.0,
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 13.0,
+        spawn_time: 16.0,
         force_type: ForceType::Attract,
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 20.0,
+        spawn_time: 25.0,
         ..default()
     });
 }

@@ -29,6 +29,7 @@ pub struct CameraPlugin;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup_camera)
+            .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
             .add_system(shake_camera);
     }
 }
