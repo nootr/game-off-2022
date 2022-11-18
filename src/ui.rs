@@ -3,9 +3,9 @@ use bevy::prelude::*;
 use crate::force::ForceType;
 use crate::game::GameState;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct UIBar {
-    pub selected_force: ForceType,
+    pub selected_force: Option<ForceType>,
 }
 
 #[derive(Component)]
@@ -32,7 +32,7 @@ impl ForceButton {
     }
 
     fn selected(&self, uibar: &UIBar) -> bool {
-        self.force_type == uibar.selected_force
+        Some(self.force_type) == uibar.selected_force
     }
 }
 
@@ -140,9 +140,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 hovered: false,
             });
         })
-        .insert(UIBar {
-            selected_force: ForceType::Passive,
-        });
+        .insert(UIBar::default());
 }
 
 fn click_button(
@@ -157,7 +155,11 @@ fn click_button(
     for (mut force_button, interaction) in &mut interaction_query {
         match *interaction {
             Interaction::Clicked => {
-                uibar.selected_force = force_button.force_type;
+                if uibar.selected_force == Some(force_button.force_type) {
+                    uibar.selected_force = None;
+                } else {
+                    uibar.selected_force = Some(force_button.force_type);
+                }
             }
             Interaction::Hovered => {
                 force_button.hovered = true;
