@@ -17,7 +17,7 @@ struct ForceButton {
 impl ForceButton {
     fn color(&self, uibar: &mut UIBar) -> Color {
         let mut color: Color = self.force_type.into();
-        color.set_a(self.alpha(&uibar));
+        color.set_a(self.alpha(uibar));
         color
     }
 
