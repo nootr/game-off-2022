@@ -1,5 +1,6 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
+use crate::camera::CameraShake;
 use crate::game::{GameState, Volatile};
 use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
@@ -107,10 +108,14 @@ fn spawn_force(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    mut camera_query: Query<&mut CameraShake>,
 ) {
     let influence = 50.0;
 
     for ev in ev_spawn_force.iter() {
+        let mut shake = camera_query.single_mut();
+        shake.trauma += 0.3;
+
         let mut color = Color::from(ev.force_type);
         color.set_a(match ev.force_type {
             ForceType::Passive => 0.0,
