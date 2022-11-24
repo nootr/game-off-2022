@@ -2,6 +2,7 @@ use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
 use crate::camera::CameraShake;
 use crate::game::{GameState, Volatile};
+use crate::grid::snap;
 use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
 use crate::ui::UIBar;
@@ -91,7 +92,7 @@ fn mouse_button_input(
                 let position = raw_position - Vec2::new(window_width, window_height) / 2.0;
 
                 ev_spawn_force.send(ForceSpawnEvent {
-                    position,
+                    position: snap(position),
                     force_type,
                 });
 
