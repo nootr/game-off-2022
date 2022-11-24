@@ -1,6 +1,8 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
+use crate::camera::CameraShake;
 use crate::game::{GameState, Volatile};
+use crate::grid::snap;
 use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
 use crate::ui::UIBar;
@@ -11,6 +13,7 @@ const REPEL_COLOR: Color = Color::rgb(0.0, 0.0, 0.65);
 
 struct ForceSpawnEvent {
     position: Vec2,
+    force_type: ForceType,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -71,21 +74,29 @@ fn mouse_button_input(
     buttons: Res<Input<MouseButton>>,
     mut ev_spawn_force: EventWriter<ForceSpawnEvent>,
     windows: Res<Windows>,
-    uibar_query: Query<&Node, With<UIBar>>,
+    mut uibar_query: Query<(&mut UIBar, &Node), With<UIBar>>,
 ) {
-    let uibar_node = uibar_query.single();
-
+    let (mut uibar, uibar_node) = uibar_query.single_mut();
     let window = windows.primary();
     let window_width = window.width();
     let window_height = window.height();
 
     if buttons.just_released(MouseButton::Left) {
-        if let Some(raw_position) = window.cursor_position() {
-            if raw_position.x > uibar_node.size().x {
-                // Do not summon a force within the UI bar.
+        if let Some(force_type) = uibar.selected_force {
+            if let Some(raw_position) = window.cursor_position() {
+                if raw_position.x < uibar_node.size().x {
+                    // Do not summon a force within the UI bar.
+                    return;
+                }
+
                 let position = raw_position - Vec2::new(window_width, window_height) / 2.0;
 
-                ev_spawn_force.send(ForceSpawnEvent { position });
+                ev_spawn_force.send(ForceSpawnEvent {
+                    position: snap(position),
+                    force_type,
+                });
+
+                uibar.selected_force = None;
             }
         }
     }
@@ -98,20 +109,20 @@ fn spawn_force(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    uibar_query: Query<&UIBar, With<UIBar>>,
+    mut camera_query: Query<&mut CameraShake>,
 ) {
-    let uibar = uibar_query.single();
-
     let influence = 50.0;
-    let force_type = uibar.selected_force;
-
-    let mut color = Color::from(force_type);
-    color.set_a(match force_type {
-        ForceType::Passive => 0.0,
-        _ => 0.5,
-    });
 
     for ev in ev_spawn_force.iter() {
+        let mut shake = camera_query.single_mut();
+        shake.trauma += 0.3;
+
+        let mut color = Color::from(ev.force_type);
+        color.set_a(match ev.force_type {
+            ForceType::Passive => 0.0,
+            _ => 0.5,
+        });
+
         let texture_handle = asset_server.load("sprites/turret.png");
         let texture_atlas =
             TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
@@ -143,7 +154,7 @@ fn spawn_force(
             .insert(Force {
                 newton: 500.0,
                 influence,
-                force_type,
+                force_type: ev.force_type,
             })
             .insert(Collider::default())
             .insert(Solid)

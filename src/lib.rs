@@ -5,6 +5,7 @@ pub mod camera;
 pub mod enemies;
 pub mod force;
 pub mod game;
+pub mod grid;
 pub mod level;
 pub mod menu;
 pub mod pathfinding;
@@ -17,6 +18,7 @@ use camera::CameraPlugin;
 use enemies::EnemyPlugin;
 use force::ForcePlugin;
 use game::GamePlugin;
+use grid::GridPlugin;
 use level::LevelPlugin;
 use menu::MenuPlugin;
 use pathfinding::VectorFieldPlugin;
@@ -34,6 +36,7 @@ impl PluginGroup for GamePlugins {
             .add(CameraPlugin)
             .add(UIPlugin)
             .add(MenuPlugin)
+            .add(GridPlugin)
             .add(LevelPlugin)
             .add(VectorFieldPlugin)
             .add(SpritePlugin)
