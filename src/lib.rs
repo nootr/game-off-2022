@@ -10,6 +10,7 @@ pub mod level;
 pub mod menu;
 pub mod pathfinding;
 pub mod physics;
+pub mod sounds;
 pub mod sprite;
 pub mod tower;
 pub mod ui;
@@ -23,6 +24,7 @@ use level::LevelPlugin;
 use menu::MenuPlugin;
 use pathfinding::VectorFieldPlugin;
 use physics::PhysicsPlugin;
+use sounds::SoundPlugin;
 use sprite::SpritePlugin;
 use tower::TowerPlugin;
 use ui::UIPlugin;
@@ -34,6 +36,7 @@ impl PluginGroup for GamePlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(CameraPlugin)
+            .add(SoundPlugin)
             .add(UIPlugin)
             .add(MenuPlugin)
             .add(GridPlugin)
