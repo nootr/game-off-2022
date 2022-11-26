@@ -5,7 +5,7 @@ use bevy::{
 use log::warn;
 
 use crate::game::GameState;
-use crate::grid::get_indeces;
+use crate::grid::{get_coordinates, get_indeces};
 
 #[derive(Component)]
 pub struct Solid;
@@ -25,8 +25,15 @@ impl Default for Collider {
     }
 }
 
+#[derive(PartialEq, Eq)]
+pub enum MovingState {
+    Normal,
+    Retrace,
+}
+
 #[derive(Component)]
 pub struct Moving {
+    pub state: MovingState,
     pub velocity: Vec3,
     pub speed: f32,
     pub route_history: Vec<(usize, usize)>,
@@ -40,6 +47,7 @@ impl Default for Moving {
             speed: 0.0,
             last_delta: None,
             route_history: Vec::new(),
+            state: MovingState::Normal,
         }
     }
 }
@@ -114,18 +122,45 @@ fn collision_system(
 
 fn move_system(mut query: Query<(&mut Moving, &mut Transform)>, time: Res<Time>) {
     for (mut moving, mut transform) in &mut query {
-        let delta = moving.velocity.normalize() * moving.speed * time.delta_seconds();
-        moving.last_delta = Some(delta);
-        transform.translation += delta;
+        match moving.state {
+            MovingState::Normal => {
+                let delta = moving.velocity.normalize() * moving.speed * time.delta_seconds();
+                moving.last_delta = Some(delta);
+                transform.translation += delta;
 
-        let indeces = get_indeces(transform.translation.truncate());
-        match moving.route_history.last() {
-            Some(last_indeces) => {
-                if *last_indeces != indeces {
-                    moving.route_history.push(indeces);
+                let indeces = get_indeces(transform.translation.truncate());
+                match moving.route_history.last() {
+                    Some(last_indeces) => {
+                        if *last_indeces != indeces {
+                            moving.route_history.push(indeces);
+                        }
+                    }
+                    None => moving.route_history.push(indeces),
                 }
             }
-            None => moving.route_history.push(indeces),
+            MovingState::Retrace => {
+                // Remove last indeces from route history if we've arrived there.
+                if let Some(last_indeces) = moving.route_history.last() {
+                    let current_indeces = get_indeces(transform.translation.truncate());
+                    if current_indeces == *last_indeces {
+                        moving.route_history.pop();
+                    }
+                }
+
+                let delta = match moving.route_history.last() {
+                    Some((x, y)) => {
+                        let current_coordinates = get_coordinates(*x, *y);
+                        current_coordinates.extend(0.0) - transform.translation
+                    }
+                    None => moving.last_delta.unwrap_or(Vec3::ZERO),
+                }
+                .normalize()
+                    * moving.speed
+                    * time.delta_seconds();
+
+                moving.last_delta = Some(delta);
+                transform.translation += delta;
+            }
         }
     }
 }
