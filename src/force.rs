@@ -33,6 +33,16 @@ impl From<ForceType> for Color {
     }
 }
 
+impl ForceType {
+    pub fn price(&self) -> f32 {
+        match self {
+            ForceType::Passive => 30.0,
+            ForceType::Attract => 50.0,
+            ForceType::Repel => 60.0,
+        }
+    }
+}
+
 #[derive(Component)]
 pub struct Force {
     pub newton: f32,

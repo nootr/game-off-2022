@@ -3,8 +3,8 @@ use bevy::prelude::*;
 use crate::game::{GameState, Volatile};
 
 #[derive(Debug, Default, Resource)]
-struct Points {
-    owned: f32,
+pub struct Points {
+    pub owned: f32,
 }
 
 #[derive(Component)]

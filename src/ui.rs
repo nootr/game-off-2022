@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::cost::Points;
 use crate::force::ForceType;
 use crate::game::GameState;
 
@@ -168,13 +169,18 @@ fn click_button(
 }
 
 fn button_color(
+    points: Res<Points>,
     mut button_query: Query<(&ForceButton, &mut BackgroundColor)>,
     mut uibar_query: Query<&mut UIBar>,
 ) {
     let mut uibar = uibar_query.single_mut();
 
     for (force_button, mut color) in &mut button_query {
-        *color = force_button.color(&mut uibar).into();
+        if force_button.force_type.price() > points.owned {
+            *color = Color::rgba(1.0, 1.0, 1.0, 0.1).into();
+        } else {
+            *color = force_button.color(&mut uibar).into();
+        }
     }
 }
 
