@@ -11,6 +11,7 @@ use crate::sprite::AnimationTimer;
 struct EnemySpawnEvent {
     influence: f32,
     force_type: ForceType,
+    attention_span: u64,
 }
 
 #[derive(Debug)]
@@ -18,6 +19,7 @@ pub struct EnemySpawn {
     pub spawn_timer: Timer,
     influence: f32,
     force_type: ForceType,
+    attention_span: u64,
 }
 
 impl Default for EnemySpawn {
@@ -26,6 +28,7 @@ impl Default for EnemySpawn {
             spawn_timer: Timer::new(Duration::from_secs(0), TimerMode::Once),
             influence: 80.0,
             force_type: ForceType::Passive,
+            attention_span: 15,
         }
     }
 }
@@ -60,6 +63,7 @@ fn setup_wave(mut enemy_queue: ResMut<EnemySpawnQueue>) {
     enemy_queue.enemies.push(EnemySpawn {
         spawn_timer: Timer::new(Duration::from_secs(9), TimerMode::Once),
         force_type: ForceType::Repel,
+        attention_span: 25,
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
@@ -72,7 +76,7 @@ fn setup_wave(mut enemy_queue: ResMut<EnemySpawnQueue>) {
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_timer: Timer::new(Duration::from_secs(25), TimerMode::Once),
+        spawn_timer: Timer::new(Duration::from_secs(40), TimerMode::Once),
         ..default()
     });
 }
@@ -95,6 +99,7 @@ fn tick_wave(
             ev_spawn_enemy.send(EnemySpawnEvent {
                 influence: enemy_spawn.influence,
                 force_type: enemy_spawn.force_type,
+                attention_span: enemy_spawn.attention_span,
             });
 
             false
@@ -125,8 +130,8 @@ fn spawn_enemy(
 
         let height = rand::thread_rng().gen_range(-half_height..half_height);
 
-        let moving_delta = rand::thread_rng().gen_range(-10.0..10.0);
-        let moving = Moving::new(Vec3::new(100.0 + moving_delta, 0.0, 0.0));
+        let moving_delta = rand::thread_rng().gen_range(-25.0..25.0);
+        let moving = Moving::new(Vec3::new(150.0 + moving_delta, 0.0, 0.0));
 
         let mut color = Color::from(ev.force_type);
         color.set_a(match ev.force_type {
@@ -167,7 +172,7 @@ fn spawn_enemy(
                 },
                 AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
                 Enemy {
-                    timer: Timer::new(Duration::from_secs(15), TimerMode::Once),
+                    timer: Timer::new(Duration::from_secs(ev.attention_span), TimerMode::Once),
                     ..default()
                 },
                 Volatile,
