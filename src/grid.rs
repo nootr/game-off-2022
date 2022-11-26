@@ -10,14 +10,14 @@ const GRID_COLUMNS: usize = 24;
 #[derive(Debug, Component)]
 struct Cell;
 
-fn get_coordinates(row: usize, column: usize) -> Vec2 {
+pub fn get_coordinates(row: usize, column: usize) -> Vec2 {
     Vec2::new(
         (row as f32 - GRID_ROWS as f32 / 2.0) * CELL_HEIGHT * 4.0,
         (column as f32 - GRID_COLUMNS as f32 / 2.0) * CELL_WIDTH * 4.0,
     )
 }
 
-fn get_indeces(position: Vec2) -> (usize, usize) {
+pub fn get_indeces(position: Vec2) -> (usize, usize) {
     (
         ((position.x + CELL_WIDTH * 2.0) / (CELL_WIDTH * 4.0) + GRID_ROWS as f32 / 2.0) as usize,
         ((position.y + CELL_HEIGHT * 2.0) / (CELL_HEIGHT * 4.0) + GRID_COLUMNS as f32 / 2.0)

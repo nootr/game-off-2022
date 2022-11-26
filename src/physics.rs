@@ -5,6 +5,7 @@ use bevy::{
 use log::warn;
 
 use crate::game::GameState;
+use crate::grid::get_indeces;
 
 #[derive(Component)]
 pub struct Solid;
@@ -29,6 +30,7 @@ pub struct Moving {
     pub velocity: Vec3,
     pub speed: f32,
     last_delta: Option<Vec3>,
+    route_history: Vec<(usize, usize)>,
 }
 
 impl Default for Moving {
@@ -37,6 +39,7 @@ impl Default for Moving {
             velocity: Vec3::X,
             speed: 0.0,
             last_delta: None,
+            route_history: Vec::new(),
         }
     }
 }
@@ -114,5 +117,15 @@ fn move_system(mut query: Query<(&mut Moving, &mut Transform)>, time: Res<Time>)
         let delta = moving.velocity.normalize() * moving.speed * time.delta_seconds();
         moving.last_delta = Some(delta);
         transform.translation += delta;
+
+        let indeces = get_indeces(transform.translation.truncate());
+        match moving.route_history.last() {
+            Some(last_indeces) => {
+                if *last_indeces != indeces {
+                    moving.route_history.push(indeces);
+                }
+            }
+            None => moving.route_history.push(indeces),
+        }
     }
 }
