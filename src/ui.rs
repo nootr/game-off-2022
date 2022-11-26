@@ -92,14 +92,17 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 },
             ))
             .with_children(|parent| {
-                parent.spawn(TextBundle::from_section(
-                    "Passive",
-                    TextStyle {
-                        font: asset_server.load("fonts/PixeloidSans.ttf"),
-                        font_size: 30.0,
-                        color: Color::rgb(0.9, 0.9, 0.9),
-                    },
-                ));
+                parent.spawn(
+                    TextBundle::from_section(
+                        "Passive\n$30",
+                        TextStyle {
+                            font: asset_server.load("fonts/PixeloidSans.ttf"),
+                            font_size: 30.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    )
+                    .with_text_alignment(TextAlignment::TOP_CENTER),
+                );
             });
 
             bar.spawn((
@@ -110,14 +113,17 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 },
             ))
             .with_children(|parent| {
-                parent.spawn(TextBundle::from_section(
-                    "Attract",
-                    TextStyle {
-                        font: asset_server.load("fonts/PixeloidSans.ttf"),
-                        font_size: 30.0,
-                        color: Color::rgb(0.9, 0.9, 0.9),
-                    },
-                ));
+                parent.spawn(
+                    TextBundle::from_section(
+                        "Attract\n$50",
+                        TextStyle {
+                            font: asset_server.load("fonts/PixeloidSans.ttf"),
+                            font_size: 30.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    )
+                    .with_text_alignment(TextAlignment::TOP_CENTER),
+                );
             });
 
             bar.spawn((
@@ -128,19 +134,23 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 },
             ))
             .with_children(|parent| {
-                parent.spawn(TextBundle::from_section(
-                    "Repel",
-                    TextStyle {
-                        font: asset_server.load("fonts/PixeloidSans.ttf"),
-                        font_size: 30.0,
-                        color: Color::rgb(0.9, 0.9, 0.9),
-                    },
-                ));
+                parent.spawn(
+                    TextBundle::from_section(
+                        "Repel\n$60",
+                        TextStyle {
+                            font: asset_server.load("fonts/PixeloidSans.ttf"),
+                            font_size: 30.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    )
+                    .with_text_alignment(TextAlignment::TOP_CENTER),
+                );
             });
         });
 }
 
 fn click_button(
+    points: Res<Points>,
     mut interaction_query: Query<
         (&mut ForceButton, &Interaction),
         (Changed<Interaction>, With<Button>),
@@ -152,10 +162,12 @@ fn click_button(
     for (mut force_button, interaction) in &mut interaction_query {
         match *interaction {
             Interaction::Clicked => {
-                if uibar.selected_force == Some(force_button.force_type) {
-                    uibar.selected_force = None;
-                } else {
-                    uibar.selected_force = Some(force_button.force_type);
+                if force_button.force_type.price() <= points.owned {
+                    if uibar.selected_force == Some(force_button.force_type) {
+                        uibar.selected_force = None;
+                    } else {
+                        uibar.selected_force = Some(force_button.force_type);
+                    }
                 }
             }
             Interaction::Hovered => {
@@ -176,10 +188,10 @@ fn button_color(
     let mut uibar = uibar_query.single_mut();
 
     for (force_button, mut color) in &mut button_query {
-        if force_button.force_type.price() > points.owned {
-            *color = Color::rgba(1.0, 1.0, 1.0, 0.1).into();
-        } else {
+        if force_button.force_type.price() <= points.owned {
             *color = force_button.color(&mut uibar).into();
+        } else {
+            *color = Color::rgba(1.0, 1.0, 1.0, 0.1).into();
         }
     }
 }

@@ -15,7 +15,11 @@ pub struct CostPlugin;
 impl Plugin for CostPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Points::default())
-            .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_text))
+            .add_system_set(
+                SystemSet::on_enter(GameState::InGame)
+                    .with_system(setup_text)
+                    .with_system(reset_points),
+            )
             .add_system_set(SystemSet::on_update(GameState::InGame).with_system(increase_points));
     }
 }
@@ -27,8 +31,12 @@ fn increase_points(
 ) {
     let mut text = text_query.single_mut();
 
-    points.owned += time.delta_seconds() * 10.0;
+    points.owned += time.delta_seconds() * 5.0;
     text.sections[0].value = format!("${}", points.owned as u32);
+}
+
+fn reset_points(mut points: ResMut<Points>) {
+    points.owned = 30.0;
 }
 
 fn setup_text(mut commands: Commands, asset_server: Res<AssetServer>) {

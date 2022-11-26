@@ -123,9 +123,10 @@ fn spawn_enemy(
             TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-        let height: f32 = rand::thread_rng().gen_range(-half_height..half_height);
+        let height = rand::thread_rng().gen_range(-half_height..half_height);
 
-        let moving = Moving::new(Vec3::new(300.0, 0.0, 0.0));
+        let moving_delta = rand::thread_rng().gen_range(-10.0..10.0);
+        let moving = Moving::new(Vec3::new(100.0 + moving_delta, 0.0, 0.0));
 
         let mut color = Color::from(ev.force_type);
         color.set_a(match ev.force_type {
@@ -166,7 +167,7 @@ fn spawn_enemy(
                 },
                 AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
                 Enemy {
-                    timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
+                    timer: Timer::new(Duration::from_secs(15), TimerMode::Once),
                     ..default()
                 },
                 Volatile,
