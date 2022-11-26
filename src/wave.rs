@@ -13,9 +13,9 @@ struct EnemySpawnEvent {
     force_type: ForceType,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug)]
 pub struct EnemySpawn {
-    pub spawn_time: f32,
+    pub spawn_timer: Timer,
     influence: f32,
     force_type: ForceType,
 }
@@ -23,7 +23,7 @@ pub struct EnemySpawn {
 impl Default for EnemySpawn {
     fn default() -> Self {
         EnemySpawn {
-            spawn_time: 0.0,
+            spawn_timer: Timer::new(Duration::from_secs(0), TimerMode::Once),
             influence: 80.0,
             force_type: ForceType::Passive,
         }
@@ -50,29 +50,29 @@ impl Plugin for WavePlugin {
 
 fn setup_wave(mut enemy_queue: ResMut<EnemySpawnQueue>) {
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 4.0,
+        spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 5.0,
+        spawn_timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 9.0,
+        spawn_timer: Timer::new(Duration::from_secs(9), TimerMode::Once),
         force_type: ForceType::Repel,
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 13.0,
+        spawn_timer: Timer::new(Duration::from_secs(13), TimerMode::Once),
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 16.0,
+        spawn_timer: Timer::new(Duration::from_secs(16), TimerMode::Once),
         force_type: ForceType::Attract,
         ..default()
     });
     enemy_queue.enemies.push(EnemySpawn {
-        spawn_time: 25.0,
+        spawn_timer: Timer::new(Duration::from_secs(25), TimerMode::Once),
         ..default()
     });
 }
@@ -87,11 +87,11 @@ fn tick_wave(
         game_state.set(GameState::Won).unwrap();
     }
 
-    let time_delta = time.delta_seconds();
+    let time_delta = time.delta();
 
     enemy_queue.enemies.retain_mut(|enemy_spawn| {
-        enemy_spawn.spawn_time -= time_delta;
-        if enemy_spawn.spawn_time < 0.0 {
+        enemy_spawn.spawn_timer.tick(time_delta);
+        if enemy_spawn.spawn_timer.finished() {
             ev_spawn_enemy.send(EnemySpawnEvent {
                 influence: enemy_spawn.influence,
                 force_type: enemy_spawn.force_type,
