@@ -2,6 +2,7 @@
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
 pub mod camera;
+pub mod cost;
 pub mod enemies;
 pub mod force;
 pub mod game;
@@ -15,6 +16,7 @@ pub mod tower;
 pub mod ui;
 pub mod wave;
 use camera::CameraPlugin;
+use cost::CostPlugin;
 use enemies::EnemyPlugin;
 use force::ForcePlugin;
 use game::GamePlugin;
@@ -37,6 +39,7 @@ impl PluginGroup for GamePlugins {
             .add(UIPlugin)
             .add(MenuPlugin)
             .add(GridPlugin)
+            .add(CostPlugin)
             .add(LevelPlugin)
             .add(VectorFieldPlugin)
             .add(SpritePlugin)
