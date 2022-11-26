@@ -48,8 +48,8 @@ fn setup_cell(
     let size = Vec2::new(CELL_WIDTH, CELL_HEIGHT);
     let color = Color::rgb(0.0, 1.0, 0.0);
 
-    commands
-        .spawn(MaterialMesh2dBundle {
+    commands.spawn((
+        MaterialMesh2dBundle {
             transform: Transform {
                 translation: Vec3::ZERO,
                 scale: Vec3::splat(4.0),
@@ -58,9 +58,10 @@ fn setup_cell(
             mesh: meshes.add(Mesh::from(shape::Quad::new(size))).into(),
             material: materials.add(ColorMaterial::from(color)),
             ..default()
-        })
-        .insert(Volatile)
-        .insert(Cell);
+        },
+        Volatile,
+        Cell,
+    ));
 }
 
 fn hover_cell(windows: Res<Windows>, mut cell_query: Query<&mut Transform, With<Cell>>) {

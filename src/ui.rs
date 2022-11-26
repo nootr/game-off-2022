@@ -66,24 +66,29 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
     }
 
     commands
-        .spawn(NodeBundle {
-            style: Style {
-                size: Size::new(Val::Px(bar_width), Val::Percent(bar_height)),
-                flex_direction: FlexDirection::Column,
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    size: Size::new(Val::Px(bar_width), Val::Percent(bar_height)),
+                    flex_direction: FlexDirection::Column,
+                    ..default()
+                },
+                transform: Transform::from_translation(Vec3::new(
+                    (window.width() - bar_width) / 2.0,
+                    0.0,
+                    0.0,
+                )),
                 ..default()
             },
-            transform: Transform::from_translation(Vec3::new(
-                (window.width() - bar_width) / 2.0,
-                0.0,
-                0.0,
-            )),
-            ..default()
-        })
+            UIBar::default(),
+        ))
         .with_children(|bar| {
-            bar.spawn(create_ui_button(
-                bar_width,
-                bar_height / 3.0,
-                ForceType::Passive.into(),
+            bar.spawn((
+                create_ui_button(bar_width, bar_height / 3.0, ForceType::Passive.into()),
+                ForceButton {
+                    force_type: ForceType::Passive,
+                    hovered: false,
+                },
             ))
             .with_children(|parent| {
                 parent.spawn(TextBundle::from_section(
@@ -94,16 +99,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                         color: Color::rgb(0.9, 0.9, 0.9),
                     },
                 ));
-            })
-            .insert(ForceButton {
-                force_type: ForceType::Passive,
-                hovered: false,
             });
 
-            bar.spawn(create_ui_button(
-                bar_width,
-                bar_height / 3.0,
-                ForceType::Attract.into(),
+            bar.spawn((
+                create_ui_button(bar_width, bar_height / 3.0, ForceType::Attract.into()),
+                ForceButton {
+                    force_type: ForceType::Attract,
+                    hovered: false,
+                },
             ))
             .with_children(|parent| {
                 parent.spawn(TextBundle::from_section(
@@ -114,16 +117,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                         color: Color::rgb(0.9, 0.9, 0.9),
                     },
                 ));
-            })
-            .insert(ForceButton {
-                force_type: ForceType::Attract,
-                hovered: false,
             });
 
-            bar.spawn(create_ui_button(
-                bar_width,
-                bar_height / 3.0,
-                ForceType::Repel.into(),
+            bar.spawn((
+                create_ui_button(bar_width, bar_height / 3.0, ForceType::Repel.into()),
+                ForceButton {
+                    force_type: ForceType::Repel,
+                    hovered: false,
+                },
             ))
             .with_children(|parent| {
                 parent.spawn(TextBundle::from_section(
@@ -134,13 +135,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                         color: Color::rgb(0.9, 0.9, 0.9),
                     },
                 ));
-            })
-            .insert(ForceButton {
-                force_type: ForceType::Repel,
-                hovered: false,
             });
-        })
-        .insert(UIBar::default());
+        });
 }
 
 fn click_button(

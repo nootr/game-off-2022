@@ -129,36 +129,37 @@ fn spawn_force(
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
         let force_field = commands
-            .spawn(MaterialMesh2dBundle {
-                mesh: meshes.add(Mesh::from(shape::Circle::new(influence))).into(),
-                material: materials.add(ColorMaterial::from(color)),
-                ..default()
-            })
-            .insert(Volatile)
+            .spawn((
+                MaterialMesh2dBundle {
+                    mesh: meshes.add(Mesh::from(shape::Circle::new(influence))).into(),
+                    material: materials.add(ColorMaterial::from(color)),
+                    ..default()
+                },
+                Volatile,
+            ))
             .id();
 
         commands
-            .spawn(SpriteSheetBundle {
-                texture_atlas: texture_atlas_handle,
-                transform: Transform {
-                    translation: ev.position.extend(-1.0),
-                    scale: Vec3::splat(4.0),
+            .spawn((
+                SpriteSheetBundle {
+                    texture_atlas: texture_atlas_handle,
+                    transform: Transform {
+                        translation: ev.position.extend(-1.0),
+                        scale: Vec3::splat(4.0),
+                        ..default()
+                    },
                     ..default()
                 },
-                ..default()
-            })
-            .insert(AnimationTimer(Timer::from_seconds(
-                0.1,
-                TimerMode::Repeating,
-            )))
-            .insert(Force {
-                newton: 500.0,
-                influence,
-                force_type: ev.force_type,
-            })
-            .insert(Collider::default())
-            .insert(Solid)
-            .insert(Volatile)
+                AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                Force {
+                    newton: 500.0,
+                    influence,
+                    force_type: ev.force_type,
+                },
+                Collider::default(),
+                Solid,
+                Volatile,
+            ))
             .push_children(&[force_field]);
     }
 }

@@ -35,9 +35,7 @@ impl Plugin for CameraPlugin {
 }
 
 fn setup_camera(mut commands: Commands) {
-    commands
-        .spawn(Camera2dBundle::default())
-        .insert(CameraShake::default());
+    commands.spawn((Camera2dBundle::default(), CameraShake::default()));
 }
 
 fn shake_camera(

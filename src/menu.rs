@@ -22,14 +22,17 @@ impl Plugin for MenuPlugin {
 
 fn show_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
-        .spawn(NodeBundle {
-            style: Style {
-                flex_direction: FlexDirection::Column,
-                margin: UiRect::all(Val::Auto),
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    flex_direction: FlexDirection::Column,
+                    margin: UiRect::all(Val::Auto),
+                    ..default()
+                },
                 ..default()
             },
-            ..default()
-        })
+            MainMenuRoot::default(),
+        ))
         .with_children(|parent| {
             parent.spawn(
                 TextBundle::from_section(
@@ -65,8 +68,7 @@ fn show_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 }),
             );
-        })
-        .insert(MainMenuRoot::default());
+        });
 }
 
 fn mouse_button_input(mut game_state: ResMut<State<GameState>>, buttons: Res<Input<MouseButton>>) {

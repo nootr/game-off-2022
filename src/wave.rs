@@ -134,47 +134,48 @@ fn spawn_enemy(
         });
 
         let force_field = commands
-            .spawn(MaterialMesh2dBundle {
-                mesh: meshes
-                    .add(Mesh::from(shape::Circle::new(ev.influence)))
-                    .into(),
-                material: materials.add(ColorMaterial::from(color)),
-                ..default()
-            })
-            .insert(Volatile)
+            .spawn((
+                MaterialMesh2dBundle {
+                    mesh: meshes
+                        .add(Mesh::from(shape::Circle::new(ev.influence)))
+                        .into(),
+                    material: materials.add(ColorMaterial::from(color)),
+                    ..default()
+                },
+                Volatile,
+            ))
             .id();
 
         commands
-            .spawn(SpriteSheetBundle {
-                texture_atlas: texture_atlas_handle,
-                transform: Transform {
-                    translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
-                    scale: Vec3::splat(4.0),
+            .spawn((
+                SpriteSheetBundle {
+                    texture_atlas: texture_atlas_handle,
+                    transform: Transform {
+                        translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
+                        scale: Vec3::splat(4.0),
+                        ..default()
+                    },
                     ..default()
                 },
-                ..default()
-            })
-            .insert(ColliderBundle {
-                collider: Collider {
-                    hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
+                ColliderBundle {
+                    collider: Collider {
+                        hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
+                        ..default()
+                    },
+                    moving,
+                },
+                AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                Enemy {
+                    timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
                     ..default()
                 },
-                moving,
-            })
-            .insert(AnimationTimer(Timer::from_seconds(
-                0.1,
-                TimerMode::Repeating,
-            )))
-            .insert(Enemy {
-                timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
-                ..default()
-            })
-            .insert(Volatile)
-            .insert(Force {
-                newton: 500.0,
-                influence: ev.influence,
-                force_type: ev.force_type,
-            })
+                Volatile,
+                Force {
+                    newton: 500.0,
+                    influence: ev.influence,
+                    force_type: ev.force_type,
+                },
+            ))
             .push_children(&[force_field]);
     }
 }
