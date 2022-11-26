@@ -29,8 +29,8 @@ impl Default for Collider {
 pub struct Moving {
     pub velocity: Vec3,
     pub speed: f32,
+    pub route_history: Vec<(usize, usize)>,
     last_delta: Option<Vec3>,
-    route_history: Vec<(usize, usize)>,
 }
 
 impl Default for Moving {

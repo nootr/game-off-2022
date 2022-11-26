@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::force::Force;
+use crate::grid::{get_coordinates, get_indeces};
 use crate::pathfinding::VectorField;
 use crate::physics::Moving;
 
@@ -38,15 +39,34 @@ fn turn_enemy(
             EnemyState::WalkToTower => {
                 vector_field.get_direction(transform.translation.truncate()) * moving.speed.abs()
             }
-            EnemyState::WalkBack => Vec2::ZERO,
+            EnemyState::WalkBack => {
+                // Remove last indeces from route history if we've arrived there.
+                if let Some(last_indeces) = moving.route_history.last() {
+                    let current_indeces = get_indeces(transform.translation.truncate());
+                    if current_indeces == *last_indeces {
+                        moving.route_history.pop();
+                    }
+                }
+
+                match moving.route_history.last() {
+                    Some((x, y)) => {
+                        let current_coordinates = get_coordinates(*x, *y);
+                        current_coordinates - transform.translation.truncate()
+                    }
+                    None => Vec2::ZERO,
+                }
+            }
         };
 
-        for (force, force_transform) in &mut force_query {
-            if let Some(f) = force.get_force(
-                transform.translation.truncate(),
-                force_transform.translation.truncate(),
-            ) {
-                force_sum += f;
+        // Add external forces (except for when enemy walks back)
+        if enemy.state != EnemyState::WalkBack {
+            for (force, force_transform) in &mut force_query {
+                if let Some(f) = force.get_force(
+                    transform.translation.truncate(),
+                    force_transform.translation.truncate(),
+                ) {
+                    force_sum += f;
+                }
             }
         }
 
