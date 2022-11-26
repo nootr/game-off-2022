@@ -1,6 +1,7 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
 use crate::camera::CameraShake;
+use crate::cost::Points;
 use crate::game::{GameState, Volatile};
 use crate::grid::snap;
 use crate::physics::{Collider, Solid};
@@ -114,6 +115,7 @@ fn mouse_button_input(
 
 fn spawn_force(
     mut commands: Commands,
+    mut points: ResMut<Points>,
     mut ev_spawn_force: EventReader<ForceSpawnEvent>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
@@ -124,6 +126,8 @@ fn spawn_force(
     let influence = 50.0;
 
     for ev in ev_spawn_force.iter() {
+        points.owned -= ev.force_type.price();
+
         let mut shake = camera_query.single_mut();
         shake.trauma += 0.3;
 

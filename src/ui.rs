@@ -92,14 +92,17 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 },
             ))
             .with_children(|parent| {
-                parent.spawn(TextBundle::from_section(
-                    "Passive",
-                    TextStyle {
-                        font: asset_server.load("fonts/PixeloidSans.ttf"),
-                        font_size: 30.0,
-                        color: Color::rgb(0.9, 0.9, 0.9),
-                    },
-                ));
+                parent.spawn(
+                    TextBundle::from_section(
+                        "Passive\n$30",
+                        TextStyle {
+                            font: asset_server.load("fonts/PixeloidSans.ttf"),
+                            font_size: 30.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    )
+                    .with_text_alignment(TextAlignment::TOP_CENTER),
+                );
             });
 
             bar.spawn((
@@ -110,14 +113,17 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 },
             ))
             .with_children(|parent| {
-                parent.spawn(TextBundle::from_section(
-                    "Attract",
-                    TextStyle {
-                        font: asset_server.load("fonts/PixeloidSans.ttf"),
-                        font_size: 30.0,
-                        color: Color::rgb(0.9, 0.9, 0.9),
-                    },
-                ));
+                parent.spawn(
+                    TextBundle::from_section(
+                        "Attract\n$50",
+                        TextStyle {
+                            font: asset_server.load("fonts/PixeloidSans.ttf"),
+                            font_size: 30.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    )
+                    .with_text_alignment(TextAlignment::TOP_CENTER),
+                );
             });
 
             bar.spawn((
@@ -128,14 +134,17 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
                 },
             ))
             .with_children(|parent| {
-                parent.spawn(TextBundle::from_section(
-                    "Repel",
-                    TextStyle {
-                        font: asset_server.load("fonts/PixeloidSans.ttf"),
-                        font_size: 30.0,
-                        color: Color::rgb(0.9, 0.9, 0.9),
-                    },
-                ));
+                parent.spawn(
+                    TextBundle::from_section(
+                        "Repel\n$60",
+                        TextStyle {
+                            font: asset_server.load("fonts/PixeloidSans.ttf"),
+                            font_size: 30.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    )
+                    .with_text_alignment(TextAlignment::TOP_CENTER),
+                );
             });
         });
 }
