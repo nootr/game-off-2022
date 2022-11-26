@@ -14,7 +14,7 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(turn_enemy).add_system(update_timer);
+        app.add_system(turn_enemy).add_system(walk_back);
     }
 }
 
@@ -50,7 +50,7 @@ fn turn_enemy(
     }
 }
 
-fn update_timer(
+fn walk_back(
     mut commands: Commands,
     mut enemy_query: Query<(Entity, &mut Enemy, &mut Moving)>,
     time: Res<Time>,
