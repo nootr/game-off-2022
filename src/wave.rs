@@ -1,5 +1,6 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use rand::Rng;
+use std::time::Duration;
 
 use crate::enemies::Enemy;
 use crate::force::{Force, ForceType};
@@ -164,7 +165,10 @@ fn spawn_enemy(
                 0.1,
                 TimerMode::Repeating,
             )))
-            .insert(Enemy)
+            .insert(Enemy {
+                timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
+                ..default()
+            })
             .insert(Volatile)
             .insert(Force {
                 newton: 500.0,
