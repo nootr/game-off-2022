@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::game::{GameState, Volatile};
-use crate::grid::snap;
+use crate::grid::get_coordinates;
 use crate::physics::{Collider, Solid};
 
 pub struct LevelPlugin;
@@ -13,42 +13,40 @@ impl Plugin for LevelPlugin {
 }
 
 fn setup_walls(mut commands: Commands, asset_server: Res<AssetServer>) {
-    for y in 0..10 {
+    let level = 1;
+    let locations = match level {
+        1 => vec![
+            // Upper wall
+            (10, 14),
+            (11, 14),
+            (12, 14),
+            (13, 14),
+            (14, 14),
+            // Left wall
+            (10, 11),
+            (10, 12),
+            (10, 13),
+            // Right wall
+            (14, 11),
+            (14, 12),
+            (14, 13),
+            // Lower wall
+            (10, 10),
+            (11, 10),
+            (13, 10),
+            (14, 10),
+        ],
+        _ => Vec::new(),
+    };
+
+    for (row, column) in locations {
+        let coordinates = get_coordinates(row, column);
+
         commands.spawn((
             SpriteBundle {
                 texture: asset_server.load("sprites/wall.png"),
                 transform: Transform {
-                    translation: snap(Vec2::new(-300.0, (y as f32 - 5.0) * 40.0)).extend(-1.0),
-                    scale: Vec3::splat(4.0),
-                    ..default()
-                },
-                ..default()
-            },
-            Collider { ..default() },
-            Volatile,
-            Solid,
-        ));
-    }
-    for x in 0..10 {
-        commands.spawn((
-            SpriteBundle {
-                texture: asset_server.load("sprites/wall.png"),
-                transform: Transform {
-                    translation: snap(Vec2::new(-300.0 + 50.0 * (x as f32), -210.0)).extend(-1.0),
-                    scale: Vec3::splat(4.0),
-                    ..default()
-                },
-                ..default()
-            },
-            Collider { ..default() },
-            Volatile,
-            Solid,
-        ));
-        commands.spawn((
-            SpriteBundle {
-                texture: asset_server.load("sprites/wall.png"),
-                transform: Transform {
-                    translation: snap(Vec2::new(-300.0 + 50.0 * (x as f32), 200.0)).extend(-1.0),
+                    translation: coordinates.extend(-1.0),
                     scale: Vec3::splat(4.0),
                     ..default()
                 },
