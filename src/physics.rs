@@ -20,7 +20,7 @@ impl Default for Collider {
     fn default() -> Self {
         Collider {
             hit: false,
-            hit_box: Vec2::new(4.0 * 24.0, 4.0 * 24.0),
+            hit_box: Vec2::new(4.0 * 20.0, 4.0 * 20.0),
         }
     }
 }

@@ -21,8 +21,8 @@ use std::{cmp, fmt};
 use crate::physics::{Collider, Solid};
 use crate::tower::Tower;
 
-const GRID_ROWS: usize = 30;
-const GRID_COLUMNS: usize = 30;
+const GRID_ROWS: usize = 32;
+const GRID_COLUMNS: usize = 32;
 
 #[derive(Debug)]
 enum Movement {
