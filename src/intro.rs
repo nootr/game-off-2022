@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::{Audio, *};
 
 use crate::game::{GameState, Volatile};
 use crate::grid::get_coordinates;
@@ -14,6 +15,7 @@ struct TextView;
 #[derive(Debug, Default, Resource)]
 pub struct ConversationLine {
     pub number: u8,
+    played_sound: bool,
 }
 
 pub struct IntroPlugin;
@@ -183,40 +185,50 @@ fn setup_textview(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn update_conversation(
-    conversation_line: Res<ConversationLine>,
+    mut conversation_line: ResMut<ConversationLine>,
     mut text_query: Query<&mut Text, With<Conversation>>,
     mut game_state: ResMut<State<GameState>>,
+    asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
 ) {
     let mut text = text_query.single_mut();
     let color_bob = Color::FUCHSIA;
     let color_manager = Color::rgb(0.542, 0.674, 1.0);
 
-    let (color, line) = match conversation_line.number {
-        0 => (color_manager, "Look, Dumbo.."),
-        1 => (color_bob, "...it's Bob..."),
-        2 => (color_manager, "I'm only gonna tell you once."),
-        3 => (color_manager, "It wasn't my plan to hire an elephant to do\noptimisations around the department, but\nhere we are."),
-        4 => (color_manager, "As supply manager it's your job\nto optimize the department.."),
-        5 => (color_manager, "..but DON'T cause any distractions!"),
-        6 => (color_manager, "If I see a co-worker hanging around\nat your station you will be fired."),
-        7 => (color_manager, "I don't care how you do it but make\nsure to hide that face of yours."),
-        8 => (color_manager, "Employees here aren't accustomed\nseeing elephants everyday.."),
-        9 => (color_manager, "..and it would make my day a lot\nbetter if i don't see that dopey\nface of yours the entire day."),
-        10 => (color_manager, "Enjoy your workday, Dumbo!"),
-        11 => (color_bob, "..."),
+    let (sound_file, color, line) = match conversation_line.number {
+        0 => (Some("sounds/Manager_Intro1.mp3"), color_manager, "Look, Dumbo.."),
+        1 => (Some("sounds/Bob_Intro1.mp3"), color_bob, "...it's Bob..."),
+        2 => (Some("sounds/Manager_Intro2.mp3"), color_manager, "I'm only gonna tell you once."),
+        3 => (Some("sounds/Manager_Intro3.mp3"), color_manager, "It wasn't my plan to hire an elephant to do\noptimisations around the department, but\nhere we are."),
+        4 => (Some("sounds/Manager_Intro4.mp3"), color_manager, "As supply manager it's your job\nto optimize the department.."),
+        5 => (Some("sounds/Manager_Intro2.mp3"), color_manager, "..but DON'T cause any distractions!"),
+        6 => (Some("sounds/Manager_Intro5.mp3"), color_manager, "If I see a co-worker hanging around\nat your station you will be fired."),
+        7 => (Some("sounds/Manager_Intro6.mp3"), color_manager, "I don't care how you do it but make\nsure to hide that face of yours."),
+        8 => (Some("sounds/Manager_Intro7.mp3"), color_manager, "Employees here aren't accustomed\nseeing elephants everyday.."),
+        9 => (Some("sounds/Manager_Intro8.mp3"), color_manager, "..and it would make my day a lot\nbetter if I don't see that dopey\nface of yours the entire day."),
+        10 => (Some("sounds/Manager_Intro1.mp3"), color_manager, "Enjoy your workday, Dumbo!"),
+        11 => (None, color_bob, "..."),
         _ => {
             game_state.set(GameState::InGame).unwrap();
-            (Color::RED, "???")
+            (None, Color::RED, "???")
         }
     };
 
     text.sections[0].value = line.to_string();
     text.sections[0].style.color = color;
+
+    if let Some(file) = sound_file {
+        if !conversation_line.played_sound {
+            audio.play(asset_server.load(file));
+            conversation_line.played_sound = true;
+        }
+    }
 }
 
 fn next_line(buttons: Res<Input<MouseButton>>, mut conversation_line: ResMut<ConversationLine>) {
     if buttons.just_released(MouseButton::Left) {
         conversation_line.number += 1;
+        conversation_line.played_sound = false;
     }
 }
 

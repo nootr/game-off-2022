@@ -1,6 +1,7 @@
 #![allow(clippy::type_complexity)]
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
+pub mod audio;
 pub mod camera;
 pub mod cost;
 pub mod enemies;
@@ -16,6 +17,7 @@ pub mod sprite;
 pub mod tower;
 pub mod ui;
 pub mod wave;
+use audio::AudioPlugin;
 use camera::CameraPlugin;
 use cost::CostPlugin;
 use enemies::EnemyPlugin;
@@ -38,6 +40,7 @@ impl PluginGroup for GamePlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(CameraPlugin)
+            .add(AudioPlugin)
             .add(UIPlugin)
             .add(MenuPlugin)
             .add(IntroPlugin)

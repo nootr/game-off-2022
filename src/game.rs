@@ -54,7 +54,7 @@ fn set_game_over_timer(mut commands: Commands) {
 
 fn set_win_timer(mut commands: Commands) {
     commands.spawn(StateTimer {
-        timer: Timer::new(Duration::from_secs(2), TimerMode::Once),
+        timer: Timer::new(Duration::from_secs(7), TimerMode::Once),
     });
 }
 
