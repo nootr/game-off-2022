@@ -7,6 +7,7 @@ use crate::level::Level;
 pub enum GameState {
     MainMenu,
     Start,
+    Intro,
     InGame,
     Won,
     GameOver,
@@ -30,7 +31,7 @@ impl Plugin for GamePlugin {
                 SystemSet::on_enter(GameState::GameOver).with_system(set_game_over_timer),
             )
             .add_system_set(SystemSet::on_update(GameState::GameOver).with_system(tick_state_timer))
-            .add_system_set(SystemSet::on_exit(GameState::GameOver).with_system(cleanup_volatile))
+            .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(cleanup_volatile))
             .add_system_set(SystemSet::on_enter(GameState::Won).with_system(next_level))
             .add_system_set(SystemSet::on_enter(GameState::Won).with_system(show_win_text))
             .add_system_set(SystemSet::on_enter(GameState::Won).with_system(set_win_timer))

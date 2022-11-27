@@ -8,9 +8,9 @@ use crate::sprite::AnimationTimer;
 #[allow(dead_code)] // The unused handles might come in handy later
 #[derive(Component, Default)]
 pub struct Tower {
-    idle_handle: Handle<TextureAtlas>,
-    scared_handle: Handle<TextureAtlas>,
-    side_handle: Handle<TextureAtlas>,
+    pub idle_handle: Handle<TextureAtlas>,
+    pub scared_handle: Handle<TextureAtlas>,
+    pub side_handle: Handle<TextureAtlas>,
 }
 
 pub struct TowerPlugin;

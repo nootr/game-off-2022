@@ -20,7 +20,7 @@ impl Plugin for LevelPlugin {
     }
 }
 
-fn setup_floor(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn setup_floor(mut commands: Commands, asset_server: Res<AssetServer>) {
     let mut rng = rand::thread_rng();
 
     for row in 0..24 {
