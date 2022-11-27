@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use std::time::Duration;
 
+use crate::level::Level;
+
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum GameState {
     MainMenu,
@@ -11,7 +13,7 @@ pub enum GameState {
 }
 
 #[derive(Component)]
-struct GameOverTimer {
+struct StateTimer {
     timer: Timer,
 }
 
@@ -27,11 +29,13 @@ impl Plugin for GamePlugin {
             .add_system_set(
                 SystemSet::on_enter(GameState::GameOver).with_system(set_game_over_timer),
             )
-            .add_system_set(
-                SystemSet::on_update(GameState::GameOver).with_system(tick_game_over_timer),
-            )
+            .add_system_set(SystemSet::on_update(GameState::GameOver).with_system(tick_state_timer))
             .add_system_set(SystemSet::on_exit(GameState::GameOver).with_system(cleanup_volatile))
-            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(show_win_text));
+            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(next_level))
+            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(show_win_text))
+            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(set_win_timer))
+            .add_system_set(SystemSet::on_update(GameState::Won).with_system(tick_state_timer))
+            .add_system_set(SystemSet::on_exit(GameState::Won).with_system(cleanup_volatile));
     }
 }
 
@@ -42,15 +46,25 @@ fn cleanup_volatile(mut commands: Commands, volatile_query: Query<Entity, With<V
 }
 
 fn set_game_over_timer(mut commands: Commands) {
-    commands.spawn(GameOverTimer {
+    commands.spawn(StateTimer {
         timer: Timer::new(Duration::from_secs(1), TimerMode::Once),
     });
 }
 
-fn tick_game_over_timer(
+fn set_win_timer(mut commands: Commands) {
+    commands.spawn(StateTimer {
+        timer: Timer::new(Duration::from_secs(2), TimerMode::Once),
+    });
+}
+
+fn next_level(mut level: ResMut<Level>) {
+    level.level += 1;
+}
+
+fn tick_state_timer(
     mut commands: Commands,
     mut game_state: ResMut<State<GameState>>,
-    mut q: Query<(Entity, &mut GameOverTimer)>,
+    mut q: Query<(Entity, &mut StateTimer)>,
     time: Res<Time>,
 ) {
     for (entity, mut timer) in q.iter_mut() {
@@ -64,12 +78,15 @@ fn tick_game_over_timer(
 }
 
 fn show_win_text(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(TextBundle::from_section(
-        "You've survived the day!",
-        TextStyle {
-            font: asset_server.load("fonts/PixeloidSans.ttf"),
-            font_size: 100.0,
-            color: Color::GREEN,
-        },
+    commands.spawn((
+        TextBundle::from_section(
+            "You've survived the day!",
+            TextStyle {
+                font: asset_server.load("fonts/PixeloidSans.ttf"),
+                font_size: 100.0,
+                color: Color::GREEN,
+            },
+        ),
+        Volatile,
     ));
 }

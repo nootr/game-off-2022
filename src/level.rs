@@ -4,17 +4,22 @@ use crate::game::{GameState, Volatile};
 use crate::grid::get_coordinates;
 use crate::physics::{Collider, Solid};
 
+#[derive(Debug, Default, Resource)]
+pub struct Level {
+    pub level: u8,
+}
+
 pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_walls));
+        app.insert_resource(Level { level: 1 })
+            .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_walls));
     }
 }
 
-fn setup_walls(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let level = 1;
-    let locations = match level {
+fn setup_walls(mut commands: Commands, level: Res<Level>, asset_server: Res<AssetServer>) {
+    let locations = match level.level {
         1 => vec![
             // Upper wall
             (10, 14),
@@ -35,6 +40,22 @@ fn setup_walls(mut commands: Commands, asset_server: Res<AssetServer>) {
             (11, 10),
             (13, 10),
             (14, 10),
+        ],
+        2 => vec![
+            // Upper wall
+            (10, 14),
+            (11, 14),
+            (12, 14),
+            (13, 14),
+            (14, 14),
+            // Left wall
+            (10, 11),
+            (10, 12),
+            (10, 13),
+            // Right wall
+            (14, 11),
+            (14, 12),
+            (14, 13),
         ],
         _ => Vec::new(),
     };
