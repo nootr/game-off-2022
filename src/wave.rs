@@ -1,4 +1,4 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 use rand::Rng;
 use std::time::Duration;
 
@@ -13,6 +13,8 @@ struct EnemySpawnEvent {
     influence: f32,
     force_type: ForceType,
     attention_span: u64,
+    sprite: String,
+    sprite_size: Vec2,
 }
 
 #[derive(Debug)]
@@ -21,6 +23,8 @@ pub struct EnemySpawn {
     influence: f32,
     force_type: ForceType,
     attention_span: u64,
+    sprite: String,
+    sprite_size: Vec2,
 }
 
 impl Default for EnemySpawn {
@@ -30,6 +34,8 @@ impl Default for EnemySpawn {
             influence: 80.0,
             force_type: ForceType::Passive,
             attention_span: 15,
+            sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
+            sprite_size: Vec2::new(16.0, 24.0),
         }
     }
 }
@@ -57,35 +63,43 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
         1 => {
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(20), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC02_M_walk.png".into(),
                 ..default()
             });
         }
         2 => {
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC02_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(9), TimerMode::Once),
                 force_type: ForceType::Repel,
                 attention_span: 25,
+                sprite: "sprites/spritesheet_NPC04_M_walk.png".into(),
+                sprite_size: Vec2::new(16.0, 32.0),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(13), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC03_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(16), TimerMode::Once),
                 force_type: ForceType::Attract,
+                sprite: "sprites/spritesheet_NPC00_F_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
@@ -93,7 +107,9 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
                 ..default()
             });
         }
-        _ => {}
+        _ => {
+            // TODO: Win screen
+        }
     }
 }
 
@@ -116,6 +132,8 @@ fn tick_wave(
                 influence: enemy_spawn.influence,
                 force_type: enemy_spawn.force_type,
                 attention_span: enemy_spawn.attention_span,
+                sprite: enemy_spawn.sprite.clone(),
+                sprite_size: enemy_spawn.sprite_size,
             });
 
             false
@@ -131,17 +149,15 @@ fn spawn_enemy(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     windows: Res<Windows>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     for ev in ev_spawn_enemy.iter() {
         let window = windows.primary();
         let half_width = window.width() as f32 * 0.5;
         let half_height = window.height() as f32 * 0.5;
 
-        let texture_handle = asset_server.load("sprites/enemy.png");
+        let texture_handle = asset_server.load(&ev.sprite);
         let texture_atlas =
-            TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
+            TextureAtlas::from_grid(texture_handle, ev.sprite_size, 6, 1, None, None);
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
         let height = rand::thread_rng().gen_range(-half_height..half_height);
@@ -155,50 +171,34 @@ fn spawn_enemy(
             _ => 0.5,
         });
 
-        let force_field = commands
-            .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Mesh::from(shape::Circle::new(ev.influence)))
-                        .into(),
-                    material: materials.add(ColorMaterial::from(color)),
+        commands.spawn((
+            SpriteSheetBundle {
+                texture_atlas: texture_atlas_handle,
+                transform: Transform {
+                    translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
+                    scale: Vec3::splat(4.0 * 1.5),
                     ..default()
                 },
-                Volatile,
-            ))
-            .id();
-
-        commands
-            .spawn((
-                SpriteSheetBundle {
-                    texture_atlas: texture_atlas_handle,
-                    transform: Transform {
-                        translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
-                        scale: Vec3::splat(4.0),
-                        ..default()
-                    },
+                ..default()
+            },
+            ColliderBundle {
+                collider: Collider {
+                    hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
                     ..default()
                 },
-                ColliderBundle {
-                    collider: Collider {
-                        hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
-                        ..default()
-                    },
-                    moving,
-                },
-                AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-                Enemy {
-                    timer: Timer::new(Duration::from_secs(ev.attention_span), TimerMode::Once),
-                    ..default()
-                },
-                Volatile,
-                Force {
-                    newton: 500.0,
-                    influence: ev.influence,
-                    force_type: ev.force_type,
-                },
-            ))
-            .push_children(&[force_field]);
+                moving,
+            },
+            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+            Enemy {
+                timer: Timer::new(Duration::from_secs(ev.attention_span), TimerMode::Once),
+            },
+            Volatile,
+            Force {
+                newton: 500.0,
+                influence: ev.influence,
+                force_type: ev.force_type,
+            },
+        ));
     }
 }
 

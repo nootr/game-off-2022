@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
+use bevy_kira_audio::prelude::*;
 
 use game_off_2022::GamePlugins;
 
@@ -17,6 +18,7 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
         )
+        .add_plugin(AudioPlugin)
         .add_plugins(GamePlugins)
         .add_plugin(WorldInspectorPlugin::new())
         .run();

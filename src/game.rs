@@ -7,6 +7,7 @@ use crate::level::Level;
 pub enum GameState {
     MainMenu,
     Start,
+    Intro,
     InGame,
     Won,
     GameOver,
@@ -30,7 +31,7 @@ impl Plugin for GamePlugin {
                 SystemSet::on_enter(GameState::GameOver).with_system(set_game_over_timer),
             )
             .add_system_set(SystemSet::on_update(GameState::GameOver).with_system(tick_state_timer))
-            .add_system_set(SystemSet::on_exit(GameState::GameOver).with_system(cleanup_volatile))
+            .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(cleanup_volatile))
             .add_system_set(SystemSet::on_enter(GameState::Won).with_system(next_level))
             .add_system_set(SystemSet::on_enter(GameState::Won).with_system(show_win_text))
             .add_system_set(SystemSet::on_enter(GameState::Won).with_system(set_win_timer))
@@ -47,13 +48,13 @@ fn cleanup_volatile(mut commands: Commands, volatile_query: Query<Entity, With<V
 
 fn set_game_over_timer(mut commands: Commands) {
     commands.spawn(StateTimer {
-        timer: Timer::new(Duration::from_secs(1), TimerMode::Once),
+        timer: Timer::new(Duration::from_secs(3), TimerMode::Once),
     });
 }
 
 fn set_win_timer(mut commands: Commands) {
     commands.spawn(StateTimer {
-        timer: Timer::new(Duration::from_secs(2), TimerMode::Once),
+        timer: Timer::new(Duration::from_secs(7), TimerMode::Once),
     });
 }
 

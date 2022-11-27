@@ -72,8 +72,12 @@ pub struct PhysicsPlugin;
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_update(GameState::InGame).with_system(collision_system))
-            .add_system_set(SystemSet::on_update(GameState::InGame).with_system(move_system));
+        app.add_system_set(
+            SystemSet::on_update(GameState::InGame)
+                .with_system(collision_system)
+                .with_system(move_system)
+                .with_system(flip_sprite_system),
+        );
     }
 }
 
@@ -161,6 +165,16 @@ fn move_system(mut query: Query<(&mut Moving, &mut Transform)>, time: Res<Time>)
                 moving.last_delta = Some(delta);
                 transform.translation += delta;
             }
+        }
+    }
+}
+
+fn flip_sprite_system(mut moving_query: Query<(&mut Moving, &mut Transform), Without<Solid>>) {
+    for (moving, mut transform) in &mut moving_query {
+        if moving.velocity.x < 0.0 {
+            transform.rotation = Quat::from_rotation_y(std::f32::consts::PI);
+        } else {
+            transform.rotation = Quat::default();
         }
     }
 }

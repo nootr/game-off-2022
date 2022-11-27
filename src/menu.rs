@@ -93,6 +93,6 @@ fn scroll_down(
     root.frame += 75.0 * time.delta_seconds();
 
     if root.frame > 100.0 {
-        game_state.set(GameState::InGame).unwrap();
+        game_state.set(GameState::Intro).unwrap();
     }
 }
