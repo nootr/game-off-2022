@@ -5,6 +5,7 @@ use std::time::Duration;
 use crate::enemies::Enemy;
 use crate::force::{Force, ForceType};
 use crate::game::{GameState, Volatile};
+use crate::level::Level;
 use crate::physics::{Collider, ColliderBundle, Moving};
 use crate::sprite::AnimationTimer;
 
@@ -51,34 +52,49 @@ impl Plugin for WavePlugin {
     }
 }
 
-fn setup_wave(mut enemy_queue: ResMut<EnemySpawnQueue>) {
-    enemy_queue.enemies.push(EnemySpawn {
-        spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
-        ..default()
-    });
-    enemy_queue.enemies.push(EnemySpawn {
-        spawn_timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
-        ..default()
-    });
-    enemy_queue.enemies.push(EnemySpawn {
-        spawn_timer: Timer::new(Duration::from_secs(9), TimerMode::Once),
-        force_type: ForceType::Repel,
-        attention_span: 25,
-        ..default()
-    });
-    enemy_queue.enemies.push(EnemySpawn {
-        spawn_timer: Timer::new(Duration::from_secs(13), TimerMode::Once),
-        ..default()
-    });
-    enemy_queue.enemies.push(EnemySpawn {
-        spawn_timer: Timer::new(Duration::from_secs(16), TimerMode::Once),
-        force_type: ForceType::Attract,
-        ..default()
-    });
-    enemy_queue.enemies.push(EnemySpawn {
-        spawn_timer: Timer::new(Duration::from_secs(40), TimerMode::Once),
-        ..default()
-    });
+fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
+    match level.level {
+        1 => {
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(20), TimerMode::Once),
+                ..default()
+            });
+        }
+        2 => {
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(9), TimerMode::Once),
+                force_type: ForceType::Repel,
+                attention_span: 25,
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(13), TimerMode::Once),
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(16), TimerMode::Once),
+                force_type: ForceType::Attract,
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(40), TimerMode::Once),
+                ..default()
+            });
+        }
+        _ => {}
+    }
 }
 
 fn tick_wave(

@@ -20,7 +20,7 @@ impl Default for Collider {
     fn default() -> Self {
         Collider {
             hit: false,
-            hit_box: Vec2::new(4.0 * 24.0, 4.0 * 24.0),
+            hit_box: Vec2::new(4.0 * 20.0, 4.0 * 20.0),
         }
     }
 }
@@ -152,7 +152,7 @@ fn move_system(mut query: Query<(&mut Moving, &mut Transform)>, time: Res<Time>)
                         let current_coordinates = get_coordinates(*x, *y);
                         current_coordinates.extend(0.0) - transform.translation
                     }
-                    None => moving.last_delta.unwrap_or(Vec3::ZERO),
+                    None => Vec3::ZERO,
                 }
                 .normalize()
                     * moving.speed
