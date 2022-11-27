@@ -1,4 +1,5 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use rand::Rng;
 
 use crate::camera::CameraShake;
 use crate::cost::Points;
@@ -123,6 +124,7 @@ fn spawn_force(
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut camera_query: Query<&mut CameraShake>,
 ) {
+    let mut rng = rand::thread_rng();
     let influence = 50.0;
 
     for ev in ev_spawn_force.iter() {
@@ -137,15 +139,36 @@ fn spawn_force(
             _ => 0.5,
         });
 
-        let texture_handle = asset_server.load("sprites/turret.png");
-        let texture_atlas =
-            TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
+        let texture_atlas = match ev.force_type {
+            ForceType::Passive => {
+                let render_box_a: bool = rng.gen();
+                let texture_handle = asset_server.load(match render_box_a {
+                    true => "sprites/BoxA.png",
+                    false => "sprites/BoxB.png",
+                });
+                TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 1, 1, None, None)
+            }
+            ForceType::Attract => {
+                let texture_handle = asset_server.load("sprites/spritesheet_coffee.png");
+                TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 6, 1, None, None)
+            }
+            ForceType::Repel => {
+                let render_box_a: bool = rng.gen();
+                let texture_handle = asset_server.load(match render_box_a {
+                    true => "sprites/Stack_of_work.png",
+                    false => "sprites/Stack_of_work_B.png",
+                });
+                TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 1, 1, None, None)
+            }
+        };
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
         let force_field = commands
             .spawn((
                 MaterialMesh2dBundle {
-                    mesh: meshes.add(Mesh::from(shape::Circle::new(influence))).into(),
+                    mesh: meshes
+                        .add(Mesh::from(shape::Circle::new(influence / 1.5))) // TODO: set scale
+                        .into(),
                     material: materials.add(ColorMaterial::from(color)),
                     ..default()
                 },
@@ -159,7 +182,7 @@ fn spawn_force(
                     texture_atlas: texture_atlas_handle,
                     transform: Transform {
                         translation: ev.position.extend(-1.0),
-                        scale: Vec3::splat(4.0),
+                        scale: Vec3::splat(4.0 * 1.5),
                         ..default()
                     },
                     ..default()

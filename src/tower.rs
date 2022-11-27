@@ -23,9 +23,9 @@ fn setup_tower(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    let texture_handle = asset_server.load("sprites/tower.png");
+    let texture_handle = asset_server.load("sprites/spritesheet_elephant_front_idle.png");
     let texture_atlas =
-        TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
+        TextureAtlas::from_grid(texture_handle, Vec2::new(32.0, 32.0), 6, 1, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     commands.spawn((
@@ -39,7 +39,7 @@ fn setup_tower(
         Tower,
         ColliderBundle {
             collider: Collider {
-                hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
+                hit_box: Vec2::new(30.0 * 4.0, 30.0 * 4.0),
                 ..default()
             },
             ..default()

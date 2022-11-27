@@ -13,6 +13,8 @@ struct EnemySpawnEvent {
     influence: f32,
     force_type: ForceType,
     attention_span: u64,
+    sprite: String,
+    sprite_size: Vec2,
 }
 
 #[derive(Debug)]
@@ -21,6 +23,8 @@ pub struct EnemySpawn {
     influence: f32,
     force_type: ForceType,
     attention_span: u64,
+    sprite: String,
+    sprite_size: Vec2,
 }
 
 impl Default for EnemySpawn {
@@ -30,6 +34,8 @@ impl Default for EnemySpawn {
             influence: 80.0,
             force_type: ForceType::Passive,
             attention_span: 15,
+            sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
+            sprite_size: Vec2::new(16.0, 24.0),
         }
     }
 }
@@ -57,35 +63,43 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
         1 => {
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(20), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC02_M_walk.png".into(),
                 ..default()
             });
         }
         2 => {
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC02_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(9), TimerMode::Once),
                 force_type: ForceType::Repel,
                 attention_span: 25,
+                sprite: "sprites/spritesheet_NPC04_M_walk.png".into(),
+                sprite_size: Vec2::new(16.0, 32.0),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(13), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC03_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(16), TimerMode::Once),
                 force_type: ForceType::Attract,
+                sprite: "sprites/spritesheet_NPC00_F_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
@@ -93,7 +107,9 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
                 ..default()
             });
         }
-        _ => {}
+        _ => {
+            // TODO: Win screen
+        }
     }
 }
 
@@ -116,6 +132,8 @@ fn tick_wave(
                 influence: enemy_spawn.influence,
                 force_type: enemy_spawn.force_type,
                 attention_span: enemy_spawn.attention_span,
+                sprite: enemy_spawn.sprite.clone(),
+                sprite_size: enemy_spawn.sprite_size,
             });
 
             false
@@ -139,9 +157,9 @@ fn spawn_enemy(
         let half_width = window.width() as f32 * 0.5;
         let half_height = window.height() as f32 * 0.5;
 
-        let texture_handle = asset_server.load("sprites/enemy.png");
+        let texture_handle = asset_server.load(&ev.sprite);
         let texture_atlas =
-            TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
+            TextureAtlas::from_grid(texture_handle, ev.sprite_size, 6, 1, None, None);
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
         let height = rand::thread_rng().gen_range(-half_height..half_height);
@@ -174,7 +192,7 @@ fn spawn_enemy(
                     texture_atlas: texture_atlas_handle,
                     transform: Transform {
                         translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
-                        scale: Vec3::splat(4.0),
+                        scale: Vec3::splat(4.0 * 1.5),
                         ..default()
                     },
                     ..default()
