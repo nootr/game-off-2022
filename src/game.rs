@@ -47,7 +47,7 @@ fn cleanup_volatile(mut commands: Commands, volatile_query: Query<Entity, With<V
 
 fn set_game_over_timer(mut commands: Commands) {
     commands.spawn(StateTimer {
-        timer: Timer::new(Duration::from_secs(1), TimerMode::Once),
+        timer: Timer::new(Duration::from_secs(3), TimerMode::Once),
     });
 }
 
