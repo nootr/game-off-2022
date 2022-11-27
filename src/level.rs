@@ -108,7 +108,6 @@ fn setup_walls(mut commands: Commands, level: Res<Level>, asset_server: Res<Asse
                         false => Quat::default(),
                     },
                     scale: Vec3::splat(4.0 * extra_scale),
-                    ..default()
                 },
                 ..default()
             },

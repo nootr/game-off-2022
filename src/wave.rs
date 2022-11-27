@@ -1,4 +1,4 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 use rand::Rng;
 use std::time::Duration;
 
@@ -149,8 +149,6 @@ fn spawn_enemy(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     windows: Res<Windows>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     for ev in ev_spawn_enemy.iter() {
         let window = windows.primary();
@@ -173,50 +171,34 @@ fn spawn_enemy(
             _ => 0.5,
         });
 
-        let force_field = commands
-            .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Mesh::from(shape::Circle::new(ev.influence)))
-                        .into(),
-                    material: materials.add(ColorMaterial::from(color)),
+        commands.spawn((
+            SpriteSheetBundle {
+                texture_atlas: texture_atlas_handle,
+                transform: Transform {
+                    translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
+                    scale: Vec3::splat(4.0 * 1.5),
                     ..default()
                 },
-                Volatile,
-            ))
-            .id();
-
-        commands
-            .spawn((
-                SpriteSheetBundle {
-                    texture_atlas: texture_atlas_handle,
-                    transform: Transform {
-                        translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
-                        scale: Vec3::splat(4.0 * 1.5),
-                        ..default()
-                    },
+                ..default()
+            },
+            ColliderBundle {
+                collider: Collider {
+                    hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
                     ..default()
                 },
-                ColliderBundle {
-                    collider: Collider {
-                        hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
-                        ..default()
-                    },
-                    moving,
-                },
-                AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-                Enemy {
-                    timer: Timer::new(Duration::from_secs(ev.attention_span), TimerMode::Once),
-                    ..default()
-                },
-                Volatile,
-                Force {
-                    newton: 500.0,
-                    influence: ev.influence,
-                    force_type: ev.force_type,
-                },
-            ))
-            .push_children(&[force_field]);
+                moving,
+            },
+            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+            Enemy {
+                timer: Timer::new(Duration::from_secs(ev.attention_span), TimerMode::Once),
+            },
+            Volatile,
+            Force {
+                newton: 500.0,
+                influence: ev.influence,
+                force_type: ev.force_type,
+            },
+        ));
     }
 }
 

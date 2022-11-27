@@ -1,4 +1,4 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 use rand::Rng;
 
 use crate::camera::CameraShake;
@@ -120,8 +120,6 @@ fn spawn_force(
     mut ev_spawn_force: EventReader<ForceSpawnEvent>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
     mut camera_query: Query<&mut CameraShake>,
 ) {
     let mut rng = rand::thread_rng();
@@ -163,40 +161,25 @@ fn spawn_force(
         };
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-        let force_field = commands
-            .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Mesh::from(shape::Circle::new(influence / 1.5))) // TODO: set scale
-                        .into(),
-                    material: materials.add(ColorMaterial::from(color)),
+        commands.spawn((
+            SpriteSheetBundle {
+                texture_atlas: texture_atlas_handle,
+                transform: Transform {
+                    translation: ev.position.extend(-1.0),
+                    scale: Vec3::splat(4.0 * 1.5),
                     ..default()
                 },
-                Volatile,
-            ))
-            .id();
-
-        commands
-            .spawn((
-                SpriteSheetBundle {
-                    texture_atlas: texture_atlas_handle,
-                    transform: Transform {
-                        translation: ev.position.extend(-1.0),
-                        scale: Vec3::splat(4.0 * 1.5),
-                        ..default()
-                    },
-                    ..default()
-                },
-                AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-                Force {
-                    newton: 500.0,
-                    influence,
-                    force_type: ev.force_type,
-                },
-                Collider::default(),
-                Solid,
-                Volatile,
-            ))
-            .push_children(&[force_field]);
+                ..default()
+            },
+            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+            Force {
+                newton: 500.0,
+                influence,
+                force_type: ev.force_type,
+            },
+            Collider::default(),
+            Solid,
+            Volatile,
+        ));
     }
 }
