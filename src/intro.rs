@@ -116,7 +116,7 @@ fn setup_animations(
 
     commands.spawn((
         SpriteSheetBundle {
-            texture_atlas: texture_atlas_handle.clone(),
+            texture_atlas: texture_atlas_handle,
             transform: Transform::from_scale(Vec3::splat(4.0))
                 .with_translation(Vec3::new(100.0, -50.0, 0.0))
                 .with_rotation(Quat::from_rotation_y(std::f32::consts::PI)),
@@ -134,7 +134,7 @@ fn setup_animations(
 
     commands.spawn((
         SpriteSheetBundle {
-            texture_atlas: texture_atlas_handle.clone(),
+            texture_atlas: texture_atlas_handle,
             transform: Transform::from_scale(Vec3::splat(6.0))
                 .with_translation(Vec3::new(-100.0, -50.0, 0.0)),
             ..default()

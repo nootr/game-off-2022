@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::collide_aabb::collide};
 use rand::Rng;
 
 use crate::camera::CameraShake;
@@ -88,6 +88,7 @@ fn mouse_button_input(
     mut ev_spawn_force: EventWriter<ForceSpawnEvent>,
     windows: Res<Windows>,
     mut uibar_query: Query<(&mut UIBar, &Node), With<UIBar>>,
+    solid_query: Query<(&Collider, &Transform), With<Solid>>,
 ) {
     let (mut uibar, uibar_node) = uibar_query.single_mut();
     let window = windows.primary();
@@ -103,6 +104,20 @@ fn mouse_button_input(
                 }
 
                 let position = raw_position - Vec2::new(window_width, window_height) / 2.0;
+
+                // Prevent player from placing on a solid object
+                for (solid_collider, solid_transform) in &solid_query {
+                    if collide(
+                        solid_transform.translation,
+                        solid_collider.hit_box,
+                        position.extend(0.0),
+                        Vec2::new(1.0, 1.0),
+                    )
+                    .is_some()
+                    {
+                        return;
+                    }
+                }
 
                 ev_spawn_force.send(ForceSpawnEvent {
                     position: snap(position),
