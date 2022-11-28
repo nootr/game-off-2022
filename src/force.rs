@@ -1,4 +1,5 @@
 use bevy::{prelude::*, sprite::collide_aabb::collide};
+use bevy_kira_audio::prelude::{Audio, *};
 use rand::Rng;
 
 use crate::camera::CameraShake;
@@ -138,6 +139,7 @@ fn spawn_force(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     mut camera_query: Query<&mut CameraShake>,
     ghost_query: Query<Entity, With<Ghost>>,
+    audio: Res<Audio>,
 ) {
     let mut rng = rand::thread_rng();
     let influence = 50.0;
@@ -158,18 +160,43 @@ fn spawn_force(
             _ => 0.5,
         });
 
-        let texture_atlas = match ev.force_type {
+        let (sound, texture_atlas) = match ev.force_type {
             ForceType::Passive => {
                 let render_box_a: bool = rng.gen();
                 let texture_handle = asset_server.load(match render_box_a {
                     true => "sprites/BoxA.png",
                     false => "sprites/BoxB.png",
                 });
-                TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 1, 1, None, None)
+                (
+                    None,
+                    TextureAtlas::from_grid(
+                        texture_handle,
+                        Vec2::new(16.0, 16.0),
+                        1,
+                        1,
+                        None,
+                        None,
+                    ),
+                )
             }
             ForceType::Attract => {
                 let texture_handle = asset_server.load("sprites/spritesheet_coffee.png");
-                TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 6, 1, None, None)
+                let sound_a: bool = rng.gen();
+                let sound = asset_server.load(match sound_a {
+                    true => "sounds/koffie_gameplay1.mp3",
+                    false => "sounds/koffie_gameplay2.mp3",
+                });
+                (
+                    Some(sound),
+                    TextureAtlas::from_grid(
+                        texture_handle,
+                        Vec2::new(16.0, 16.0),
+                        6,
+                        1,
+                        None,
+                        None,
+                    ),
+                )
             }
             ForceType::Repel => {
                 let render_box_a: bool = rng.gen();
@@ -177,9 +204,24 @@ fn spawn_force(
                     true => "sprites/Stack_of_work.png",
                     false => "sprites/Stack_of_work_B.png",
                 });
-                TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 1, 1, None, None)
+                (
+                    None,
+                    TextureAtlas::from_grid(
+                        texture_handle,
+                        Vec2::new(16.0, 16.0),
+                        1,
+                        1,
+                        None,
+                        None,
+                    ),
+                )
             }
         };
+
+        if let Some(s) = sound {
+            audio.play(s);
+        }
+
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
         commands.spawn((
