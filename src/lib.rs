@@ -25,7 +25,6 @@ use enemies::EnemyPlugin;
 use force::ForcePlugin;
 use game::GamePlugin;
 use ghost::GhostPlugin;
-use grid::GridPlugin;
 use intro::IntroPlugin;
 use level::LevelPlugin;
 use menu::MenuPlugin;
@@ -46,7 +45,6 @@ impl PluginGroup for GamePlugins {
             .add(UIPlugin)
             .add(MenuPlugin)
             .add(IntroPlugin)
-            .add(GridPlugin)
             .add(GhostPlugin)
             .add(CostPlugin)
             .add(LevelPlugin)
