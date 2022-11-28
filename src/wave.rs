@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::{Audio, *};
 use rand::Rng;
 use std::time::Duration;
 
@@ -149,7 +150,10 @@ fn spawn_enemy(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     windows: Res<Windows>,
+    audio: Res<Audio>,
 ) {
+    let mut rng = rand::thread_rng();
+
     for ev in ev_spawn_enemy.iter() {
         let window = windows.primary();
         let half_width = window.width() as f32 * 0.5;
@@ -170,6 +174,28 @@ fn spawn_enemy(
             ForceType::Passive => 0.0,
             _ => 0.5,
         });
+
+        let sound = match ev.force_type {
+            ForceType::Repel => {
+                let sound_a: bool = rng.gen();
+                Some(asset_server.load(match sound_a {
+                    true => "sounds/Manager_Mompel1.mp3",
+                    false => "sounds/Manager_Mompel2.mp3",
+                }))
+            }
+            ForceType::Attract => {
+                let sound_a: bool = rng.gen();
+                Some(asset_server.load(match sound_a {
+                    true => "sounds/woman_gameplay1.mp3",
+                    false => "sounds/woman_gameplay2.mp3",
+                }))
+            }
+            _ => None,
+        };
+
+        if let Some(s) = sound {
+            audio.play(s);
+        }
 
         commands.spawn((
             SpriteSheetBundle {

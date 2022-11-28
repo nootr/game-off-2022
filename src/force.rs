@@ -204,8 +204,9 @@ fn spawn_force(
                     true => "sprites/Stack_of_work.png",
                     false => "sprites/Stack_of_work_B.png",
                 });
+                let sound = asset_server.load("sounds/stapelwerk_gameplay1.mp3");
                 (
-                    None,
+                    Some(sound),
                     TextureAtlas::from_grid(
                         texture_handle,
                         Vec2::new(16.0, 16.0),
