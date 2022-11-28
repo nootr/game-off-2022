@@ -4,6 +4,7 @@ use rand::Rng;
 use crate::camera::CameraShake;
 use crate::cost::Points;
 use crate::game::{GameState, Volatile};
+use crate::ghost::Ghost;
 use crate::grid::snap;
 use crate::physics::{Collider, Solid};
 use crate::sprite::AnimationTimer;
@@ -121,11 +122,16 @@ fn spawn_force(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     mut camera_query: Query<&mut CameraShake>,
+    ghost_query: Query<Entity, With<Ghost>>,
 ) {
     let mut rng = rand::thread_rng();
     let influence = 50.0;
 
     for ev in ev_spawn_force.iter() {
+        for entity in &ghost_query {
+            commands.entity(entity).despawn();
+        }
+
         points.owned -= ev.force_type.price();
 
         let mut shake = camera_query.single_mut();

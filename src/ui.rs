@@ -1,8 +1,10 @@
 use bevy::prelude::*;
+use rand::Rng;
 
 use crate::cost::Points;
 use crate::force::ForceType;
 use crate::game::GameState;
+use crate::ghost::Ghost;
 
 #[derive(Component, Default)]
 pub struct UIBar {
@@ -150,14 +152,19 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
 }
 
 fn click_button(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     points: Res<Points>,
     mut interaction_query: Query<
         (&mut ForceButton, &Interaction),
         (Changed<Interaction>, With<Button>),
     >,
     mut uibar_query: Query<&mut UIBar>,
+    ghost_query: Query<Entity, With<Ghost>>,
 ) {
     let mut uibar = uibar_query.single_mut();
+    let mut rng = rand::thread_rng();
 
     for (mut force_button, interaction) in &mut interaction_query {
         match *interaction {
@@ -168,6 +175,66 @@ fn click_button(
                     } else {
                         uibar.selected_force = Some(force_button.force_type);
                     }
+
+                    for entity in &ghost_query {
+                        commands.entity(entity).despawn();
+                    }
+                    let texture_atlas = match force_button.force_type {
+                        ForceType::Passive => {
+                            let render_box_a: bool = rng.gen();
+                            let texture_handle = asset_server.load(match render_box_a {
+                                true => "sprites/BoxA.png",
+                                false => "sprites/BoxB.png",
+                            });
+                            TextureAtlas::from_grid(
+                                texture_handle,
+                                Vec2::new(16.0, 16.0),
+                                1,
+                                1,
+                                None,
+                                None,
+                            )
+                        }
+                        ForceType::Attract => {
+                            let texture_handle =
+                                asset_server.load("sprites/spritesheet_coffee.png");
+                            TextureAtlas::from_grid(
+                                texture_handle,
+                                Vec2::new(16.0, 16.0),
+                                6,
+                                1,
+                                None,
+                                None,
+                            )
+                        }
+                        ForceType::Repel => {
+                            let render_box_a: bool = rng.gen();
+                            let texture_handle = asset_server.load(match render_box_a {
+                                true => "sprites/Stack_of_work.png",
+                                false => "sprites/Stack_of_work_B.png",
+                            });
+                            TextureAtlas::from_grid(
+                                texture_handle,
+                                Vec2::new(16.0, 16.0),
+                                1,
+                                1,
+                                None,
+                                None,
+                            )
+                        }
+                    };
+                    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+
+                    let mut sprite_sheet_bundle = SpriteSheetBundle {
+                        texture_atlas: texture_atlas_handle,
+                        transform: Transform {
+                            scale: Vec3::splat(4.0 * 1.5),
+                            ..default()
+                        },
+                        ..default()
+                    };
+                    sprite_sheet_bundle.sprite.color.set_a(0.2);
+                    commands.spawn((sprite_sheet_bundle, Ghost));
                 }
             }
             Interaction::Hovered => {

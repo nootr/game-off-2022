@@ -7,6 +7,7 @@ pub mod cost;
 pub mod enemies;
 pub mod force;
 pub mod game;
+pub mod ghost;
 pub mod grid;
 pub mod intro;
 pub mod level;
@@ -23,6 +24,7 @@ use cost::CostPlugin;
 use enemies::EnemyPlugin;
 use force::ForcePlugin;
 use game::GamePlugin;
+use ghost::GhostPlugin;
 use grid::GridPlugin;
 use intro::IntroPlugin;
 use level::LevelPlugin;
@@ -45,6 +47,7 @@ impl PluginGroup for GamePlugins {
             .add(MenuPlugin)
             .add(IntroPlugin)
             .add(GridPlugin)
+            .add(GhostPlugin)
             .add(CostPlugin)
             .add(LevelPlugin)
             .add(VectorFieldPlugin)
