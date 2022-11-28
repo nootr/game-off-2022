@@ -41,15 +41,14 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         (8, 15, "sprites/Cubicle_screen_square_B.png", 1.0, false),
         (9, 15, "sprites/Cubicle_screen_square_B.png", 1.0, false),
         (10, 15, "sprites/Cubicle_screen_corner_A.png", 1.0, false),
-        // Left wall
-        (6, 13, "sprites/Cubicle_screen_side.png", 1.0, false),
-        (6, 14, "sprites/Cubicle_screen_side.png", 1.0, false),
-        (6, 15, "sprites/Cubicle_screen_side.png", 1.0, false),
         // Right wall
         (10, 13, "sprites/Cubicle_screen_side.png", 1.0, false),
         (10, 14, "sprites/Cubicle_screen_side.png", 1.0, false),
         (10, 15, "sprites/Cubicle_screen_side.png", 1.0, false),
         // Objects
+        (9, 14, "sprites/desk_D.png", 1.5, false),
+        (9, 13, "sprites/office_chair_back.png", 2.0, false),
+        (8, 14, "sprites/plant_A.png", 1.0, false),
         (7, 14, "sprites/Cabinet.png", 1.5, false),
         (7, 13, "sprites/BoxB.png", 1.5, false),
         // Upper wall
@@ -62,23 +61,23 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         (12, 13, "sprites/Cubicle_screen_side.png", 1.0, false),
         (12, 14, "sprites/Cubicle_screen_side.png", 1.0, false),
         (12, 15, "sprites/Cubicle_screen_side.png", 1.0, false),
-        // Right wall
-        (16, 13, "sprites/Cubicle_screen_side.png", 1.0, false),
-        (16, 14, "sprites/Cubicle_screen_side.png", 1.0, false),
-        (16, 15, "sprites/Cubicle_screen_side.png", 1.0, false),
         // Objects
-        (13, 13, "sprites/BoxA.png", 1.5, false),
+        (13, 14, "sprites/desk_C.png", 1.5, false),
+        (13, 13, "sprites/office_chair.png", 2.0, false),
+        (14, 14, "sprites/plant_B.png", 1.0, false),
+        (14, 13, "sprites/BoxA.png", 1.5, false),
         (15, 14, "sprites/Cabinet.png", 1.5, false),
         // Upper wall
         (18, 15, "sprites/Cubicle_screen_corner_B.png", 1.0, true),
         (19, 15, "sprites/Cubicle_screen_square_B.png", 1.0, false),
-        // Left wall
-        (18, 13, "sprites/Cubicle_screen_side.png", 1.0, false),
-        (18, 14, "sprites/Cubicle_screen_side.png", 1.0, false),
-        (18, 15, "sprites/Cubicle_screen_side.png", 1.0, false),
         // Objects
         (19, 14, "sprites/BoxB.png", 1.5, false),
         (19, 13, "sprites/BoxA.png", 1.5, false),
+        (17, 15, "sprites/archive_cabinet.png", 1.7, false),
+        (5, 15, "sprites/archive_cabinet.png", 1.7, false),
+        (6, 11, "sprites/Stack_of_work.png", 1.5, false),
+        (17, 14, "sprites/Stack_of_work.png", 1.5, false),
+        (16, 14, "sprites/Stack_of_work_B.png", 1.5, false),
     ];
 
     let mut z = -1.0;
