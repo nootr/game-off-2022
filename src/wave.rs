@@ -105,9 +105,49 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
                 ..default()
             });
         }
-        _ => {
-            // TODO: Win screen
+        3 => {
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(3), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC03_M_walk.png".into(),
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC04_M_walk.png".into(),
+                force_type: ForceType::Repel,
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(20), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC03_M_walk.png".into(),
+                ..default()
+            });
         }
+        4 => {
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC04_M_walk.png".into(),
+                force_type: ForceType::Repel,
+                ..default()
+            });
+            for _ in 1..128 {
+                enemy_queue.enemies.push(EnemySpawn {
+                    spawn_timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
+                    sprite: "sprites/spritesheet_NPC03_M_walk.png".into(),
+                    ..default()
+                });
+            }
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(30), TimerMode::Once),
+                ..default()
+            });
+        }
+        _ => {}
     }
 }
 

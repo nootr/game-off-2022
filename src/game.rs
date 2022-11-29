@@ -35,8 +35,7 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        //app.add_state(GameState::MainMenu)
-        app.add_state(GameState::Start)
+        app.add_state(GameState::MainMenu)
             .add_system_set(
                 SystemSet::on_enter(GameState::GameOver).with_system(set_game_over_timer),
             )

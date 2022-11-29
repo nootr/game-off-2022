@@ -15,14 +15,17 @@ impl Level {
         match self.level {
             1 => "1st floor: IT department".to_string(),
             2 => "2nd floor: Sales department".to_string(),
+            3 => "3rd floor: Conference room".to_string(),
+            4 => "4th floor: Executive room".to_string(),
             _ => "???".to_string(),
         }
     }
 
     pub fn help_text(&self) -> Option<String> {
         match self.level {
-            1 => Some("Place boxes to block coworkers".to_string()),
+            1 => Some("Place boxes to block co-workers".to_string()),
             2 => Some("Coffee attracts co-workers".to_string()),
+            3 => Some("People try to avoid the manager".to_string()),
             _ => None,
         }
     }
@@ -32,7 +35,7 @@ pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Level { level: 2 })
+        app.insert_resource(Level { level: 1 })
             .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_walls))
             .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_floor));
     }
@@ -171,6 +174,29 @@ fn setup_walls(mut commands: Commands, level: Res<Level>, asset_server: Res<Asse
             // Objects
             (17, 15, "sprites/plant_B.png", 1.0, false),
             (18, 14, "sprites/plant_A.png", 1.0, true),
+        ],
+        3 => vec![
+            // Objects
+            (11, 15, "sprites/office_chair.png", 2.0, false),
+            (12, 15, "sprites/office_chair.png", 2.0, false),
+            (13, 15, "sprites/office_chair.png", 2.0, false),
+            (14, 15, "sprites/office_chair.png", 2.0, false),
+            (15, 15, "sprites/office_chair.png", 2.0, false),
+            (13, 14, "sprites/conference_desk.png", 2.0, true),
+            (13, 11, "sprites/conference_desk.png", 2.0, true),
+            (10, 11, "sprites/plant_B.png", 1.0, false),
+            (10, 14, "sprites/plant_A.png", 1.0, true),
+            (11, 10, "sprites/office_chair_back.png", 2.0, false),
+            (12, 10, "sprites/office_chair_back.png", 2.0, false),
+            (13, 10, "sprites/office_chair_back.png", 2.0, false),
+            (14, 10, "sprites/office_chair_back.png", 2.0, false),
+            (15, 10, "sprites/office_chair_back.png", 2.0, false),
+        ],
+        4 => vec![
+            (13, 15, "sprites/office_chair.png", 2.0, false),
+            (13, 14, "sprites/conference_desk.png", 2.0, true),
+            (10, 14, "sprites/plant_A.png", 1.0, false),
+            (16, 14, "sprites/plant_B.png", 1.0, true),
         ],
         _ => Vec::new(),
     };
