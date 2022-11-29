@@ -152,13 +152,18 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
 }
 
 fn tick_wave(
+    level: Res<Level>,
     mut game_state: ResMut<State<GameState>>,
     mut enemy_queue: ResMut<EnemySpawnQueue>,
     mut ev_spawn_enemy: EventWriter<EnemySpawnEvent>,
     time: Res<Time>,
 ) {
     if enemy_queue.enemies.is_empty() {
-        game_state.set(GameState::Won).unwrap();
+        if level.level == 4 {
+            game_state.set(GameState::End).unwrap();
+        } else {
+            game_state.set(GameState::Won).unwrap();
+        }
     }
 
     let time_delta = time.delta();

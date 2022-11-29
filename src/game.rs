@@ -12,10 +12,17 @@ pub enum GameState {
     InGame,
     Won,
     GameOver,
+    End,
 }
 
 #[derive(Component)]
 struct StartText;
+
+#[derive(Component)]
+struct ScrollText {
+    left: f32,
+    speed: f32,
+}
 
 #[derive(Component)]
 struct TimeText {
@@ -48,11 +55,21 @@ impl Plugin for GamePlugin {
             )
             .add_system_set(SystemSet::on_update(GameState::Start).with_system(update_timer_text))
             .add_system_set(SystemSet::on_exit(GameState::Start).with_system(cleanup_start))
-            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(cleanup_volatile))
-            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(next_level))
-            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(show_win_animation))
-            .add_system_set(SystemSet::on_enter(GameState::Won).with_system(set_win_timer))
-            .add_system_set(SystemSet::on_update(GameState::Won).with_system(tick_state_timer));
+            .add_system_set(
+                SystemSet::on_enter(GameState::Won)
+                    .with_system(cleanup_volatile)
+                    .with_system(next_level)
+                    .with_system(show_win_animation)
+                    .with_system(set_win_timer),
+            )
+            .add_system_set(SystemSet::on_update(GameState::Won).with_system(tick_state_timer))
+            .add_system_set(
+                SystemSet::on_enter(GameState::End)
+                    .with_system(show_end_screen)
+                    .with_system(cleanup_volatile),
+            )
+            .add_system_set(SystemSet::on_update(GameState::End).with_system(scroll_text))
+            .add_system_set(SystemSet::on_exit(GameState::End).with_system(cleanup_volatile));
     }
 }
 
@@ -212,4 +229,69 @@ fn show_win_animation(
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
         Volatile,
     ));
+}
+
+fn show_end_screen(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+) {
+    let texture_handle = asset_server.load("sprites/Elephant_end.png");
+    let texture_atlas =
+        TextureAtlas::from_grid(texture_handle, Vec2::new(128.0, 72.0), 1, 1, None, None);
+    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+
+    commands.spawn((
+        SpriteSheetBundle {
+            texture_atlas: texture_atlas_handle,
+            transform: Transform {
+                scale: Vec3::splat(10.0),
+                ..default()
+            },
+            ..default()
+        },
+        AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+        Volatile,
+    ));
+
+    commands.spawn((
+        TextBundle::from_section(
+            "You made it! Thanks for playing <3 Art by Guus, Audio by Tim, Code by Joris",
+            TextStyle {
+                font: asset_server.load("fonts/PixeloidSans.ttf"),
+                font_size: 40.0,
+                color: Color::WHITE,
+            },
+        )
+        .with_text_alignment(TextAlignment::TOP_CENTER)
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            position: UiRect {
+                top: Val::Px(5.0),
+                left: Val::Px(1280.0),
+                ..default()
+            },
+            ..default()
+        }),
+        Volatile,
+        ScrollText {
+            left: 1280.0,
+            speed: 200.0,
+        },
+    ));
+}
+
+fn scroll_text(
+    mut game_state: ResMut<State<GameState>>,
+    mut text_query: Query<(&mut Style, &mut ScrollText)>,
+    time: Res<Time>,
+) {
+    let (mut style, mut scroll) = text_query.single_mut();
+
+    scroll.left -= time.delta_seconds() * scroll.speed;
+    style.position.left = Val::Px(scroll.left);
+
+    if scroll.left < -1028.0 {
+        game_state.set(GameState::MainMenu).unwrap();
+    }
 }
