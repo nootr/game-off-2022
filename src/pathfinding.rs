@@ -21,10 +21,10 @@ use std::{cmp, fmt};
 use crate::physics::{Collider, Solid};
 use crate::tower::Tower;
 
-const GRID_ROWS: usize = 32;
-const GRID_COLUMNS: usize = 32;
+const GRID_ROWS: usize = 40;
+const GRID_COLUMNS: usize = 40;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 enum Movement {
     Up,
     Right,
@@ -36,11 +36,21 @@ enum Movement {
     DownLeft,
 }
 
-#[derive(Debug, Default, Resource)]
+#[derive(Debug, Resource)]
 pub struct VectorField {
     cells: [[Cell; GRID_COLUMNS]; GRID_ROWS],
     width: f32,
     height: f32,
+}
+
+impl Default for VectorField {
+    fn default() -> Self {
+        VectorField {
+            cells: [[Cell::default(); GRID_COLUMNS]; GRID_ROWS],
+            width: 1280.0,
+            height: 720.0,
+        }
+    }
 }
 
 impl fmt::Display for VectorField {
@@ -205,7 +215,7 @@ impl VectorField {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Copy, Clone)]
 struct Cell {
     solid: bool,
     tower: bool,
