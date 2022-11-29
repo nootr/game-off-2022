@@ -2,10 +2,8 @@ use bevy::prelude::*;
 
 use crate::game::GameState;
 
-#[derive(Component, Default)]
-pub struct MainMenuRoot {
-    frame: f32,
-}
+#[derive(Component)]
+pub struct MainMenuRoot;
 
 pub struct MenuPlugin;
 
@@ -15,8 +13,7 @@ impl Plugin for MenuPlugin {
             .add_system_set(
                 SystemSet::on_update(GameState::MainMenu).with_system(mouse_button_input),
             )
-            .add_system_set(SystemSet::on_update(GameState::Start).with_system(scroll_down))
-            .add_system_set(SystemSet::on_exit(GameState::Start).with_system(cleanup_root));
+            .add_system_set(SystemSet::on_exit(GameState::MainMenu).with_system(cleanup_root));
     }
 }
 
@@ -31,7 +28,7 @@ fn show_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                 },
                 ..default()
             },
-            MainMenuRoot::default(),
+            MainMenuRoot,
         ))
         .with_children(|parent| {
             parent.spawn(
@@ -73,26 +70,11 @@ fn show_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn mouse_button_input(mut game_state: ResMut<State<GameState>>, buttons: Res<Input<MouseButton>>) {
     if buttons.just_released(MouseButton::Left) {
-        game_state.set(GameState::Start).unwrap();
+        game_state.set(GameState::Intro).unwrap();
     }
 }
 
 fn cleanup_root(mut commands: Commands, menu_query: Query<Entity, With<MainMenuRoot>>) {
     let main_menu_root = menu_query.single();
     commands.entity(main_menu_root).despawn_recursive();
-}
-
-fn scroll_down(
-    mut game_state: ResMut<State<GameState>>,
-    mut style_query: Query<(&mut Style, &mut MainMenuRoot)>,
-    time: Res<Time>,
-) {
-    let (mut style, mut root) = style_query.single_mut();
-
-    style.position.top = Val::Percent(root.frame);
-    root.frame += 75.0 * time.delta_seconds();
-
-    if root.frame > 100.0 {
-        game_state.set(GameState::Intro).unwrap();
-    }
 }

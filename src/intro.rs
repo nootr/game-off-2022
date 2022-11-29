@@ -208,7 +208,7 @@ fn update_conversation(
         10 => (Some("sounds/Manager_Intro1.mp3"), color_manager, "Enjoy your workday, Dumbo!"),
         11 => (None, color_bob, "..."),
         _ => {
-            game_state.set(GameState::InGame).unwrap();
+            game_state.set(GameState::Start).unwrap();
             (None, Color::RED, "???")
         }
     };
@@ -225,7 +225,7 @@ fn update_conversation(
 }
 
 fn next_line(buttons: Res<Input<MouseButton>>, mut conversation_line: ResMut<ConversationLine>) {
-    if buttons.just_released(MouseButton::Left) {
+    if buttons.just_pressed(MouseButton::Left) {
         conversation_line.number += 1;
         conversation_line.played_sound = false;
     }

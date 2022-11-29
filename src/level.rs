@@ -10,6 +10,15 @@ pub struct Level {
     pub level: u8,
 }
 
+impl Level {
+    pub fn title(&self) -> String {
+        match self.level {
+            1 => "Basement: IT department".to_string(),
+            _ => "???".to_string(),
+        }
+    }
+}
+
 pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
