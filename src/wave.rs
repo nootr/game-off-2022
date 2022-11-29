@@ -85,36 +85,23 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
         }
         2 => {
             enemy_queue.enemies.push(EnemySpawn {
-                spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
-                sprite: "sprites/spritesheet_NPC02_M_walk.png".into(),
+                spawn_timer: Timer::new(Duration::from_secs(3), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC03_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
-                spawn_timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
+                spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
                 sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(9), TimerMode::Once),
-                force_type: ForceType::Repel,
-                attention_span: 25,
-                sprite: "sprites/spritesheet_NPC04_M_walk.png".into(),
-                sprite_size: Vec2::new(16.0, 32.0),
+                sprite: "sprites/spritesheet_NPC02_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
-                spawn_timer: Timer::new(Duration::from_secs(13), TimerMode::Once),
+                spawn_timer: Timer::new(Duration::from_secs(20), TimerMode::Once),
                 sprite: "sprites/spritesheet_NPC03_M_walk.png".into(),
-                ..default()
-            });
-            enemy_queue.enemies.push(EnemySpawn {
-                spawn_timer: Timer::new(Duration::from_secs(16), TimerMode::Once),
-                force_type: ForceType::Attract,
-                sprite: "sprites/spritesheet_NPC00_F_walk.png".into(),
-                ..default()
-            });
-            enemy_queue.enemies.push(EnemySpawn {
-                spawn_timer: Timer::new(Duration::from_secs(40), TimerMode::Once),
                 ..default()
             });
         }

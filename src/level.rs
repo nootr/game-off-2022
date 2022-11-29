@@ -13,7 +13,8 @@ pub struct Level {
 impl Level {
     pub fn title(&self) -> String {
         match self.level {
-            1 => "Basement: IT department".to_string(),
+            1 => "1st floor: IT department".to_string(),
+            2 => "2nd floor: Sales department".to_string(),
             _ => "???".to_string(),
         }
     }
@@ -21,6 +22,7 @@ impl Level {
     pub fn help_text(&self) -> Option<String> {
         match self.level {
             1 => Some("Place boxes to block coworkers".to_string()),
+            2 => Some("Coffee attracts co-workers".to_string()),
             _ => None,
         }
     }
@@ -30,7 +32,7 @@ pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Level { level: 1 })
+        app.insert_resource(Level { level: 2 })
             .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_walls))
             .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(setup_floor));
     }
@@ -127,21 +129,48 @@ fn setup_walls(mut commands: Commands, level: Res<Level>, asset_server: Res<Asse
         ],
         2 => vec![
             // Upper wall
+            (4, 16, "sprites/archive_cabinet.png", 1.1, false),
+            (5, 16, "sprites/archive_cabinet.png", 1.1, false),
+            (6, 16, "sprites/archive_cabinet.png", 1.1, false),
+            (7, 16, "sprites/archive_cabinet.png", 1.1, false),
+            (8, 16, "sprites/archive_cabinet.png", 1.1, false),
+            (9, 16, "sprites/archive_cabinet.png", 1.1, false),
+            (10, 16, "sprites/archive_cabinet.png", 1.1, false),
+            (11, 16, "sprites/archive_cabinet.png", 1.1, false),
+            (4, 15, "sprites/archive_cabinet.png", 1.1, false),
+            (5, 15, "sprites/archive_cabinet.png", 1.1, false),
+            (6, 15, "sprites/archive_cabinet.png", 1.1, false),
+            (7, 15, "sprites/archive_cabinet.png", 1.1, false),
+            (8, 15, "sprites/archive_cabinet.png", 1.1, false),
+            (9, 15, "sprites/archive_cabinet.png", 1.1, false),
+            (10, 15, "sprites/archive_cabinet.png", 1.1, false),
+            (11, 15, "sprites/archive_cabinet.png", 1.1, false),
+            (12, 15, "sprites/plant_A.png", 1.0, false),
+            // Desk
+            (6, 14, "sprites/Cubicle_screen_corner_A.png", 1.0, true),
+            (7, 14, "sprites/Cubicle_screen_square_B.png", 1.0, false),
+            (8, 14, "sprites/Cubicle_screen_square_A.png", 1.0, false),
+            (6, 13, "sprites/Cubicle_screen_side.png", 1.0, false),
+            (6, 14, "sprites/Cubicle_screen_side.png", 1.0, false),
+            (7, 13, "sprites/desk_B.png", 1.5, false),
+            (7, 12, "sprites/office_chair_back.png", 2.0, false),
+            // Desk
             (10, 14, "sprites/Cubicle_screen_corner_A.png", 1.0, true),
             (11, 14, "sprites/Cubicle_screen_square_B.png", 1.0, false),
-            (12, 14, "sprites/Cubicle_screen_square_B.png", 1.0, false),
-            (13, 14, "sprites/Cubicle_screen_square_A.png", 1.0, false),
-            (14, 14, "sprites/Cubicle_screen_corner_B.png", 1.0, false),
-            // Left wall
-            (10, 11, "sprites/Cubicle_screen_side.png", 1.0, false),
-            (10, 12, "sprites/Cubicle_screen_side.png", 1.0, false),
+            (12, 14, "sprites/Cubicle_screen_square_A.png", 1.0, false),
             (10, 13, "sprites/Cubicle_screen_side.png", 1.0, false),
             (10, 14, "sprites/Cubicle_screen_side.png", 1.0, false),
-            // Right wall
+            (11, 13, "sprites/desk_D.png", 1.5, false),
+            // Desk
+            (14, 11, "sprites/Cubicle_screen_corner_A.png", 1.0, true),
+            (15, 11, "sprites/Cubicle_screen_square_B.png", 1.0, true),
+            (16, 11, "sprites/Cubicle_screen_square_B.png", 1.0, false),
+            (14, 10, "sprites/Cubicle_screen_side.png", 1.0, false),
             (14, 11, "sprites/Cubicle_screen_side.png", 1.0, false),
-            (14, 12, "sprites/Cubicle_screen_side.png", 1.0, false),
-            (14, 13, "sprites/Cubicle_screen_side.png", 1.0, false),
-            (14, 14, "sprites/Cubicle_screen_side.png", 1.0, false),
+            (15, 10, "sprites/desk_B.png", 1.5, false),
+            // Objects
+            (17, 15, "sprites/plant_B.png", 1.0, false),
+            (18, 14, "sprites/plant_A.png", 1.0, true),
         ],
         _ => Vec::new(),
     };
