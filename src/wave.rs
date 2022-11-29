@@ -68,8 +68,13 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
     match level.level {
         1 => {
             enemy_queue.enemies.push(EnemySpawn {
-                spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                spawn_timer: Timer::new(Duration::from_secs(3), TimerMode::Once),
                 sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
+                ..default()
+            });
+            enemy_queue.enemies.push(EnemySpawn {
+                spawn_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+                sprite: "sprites/spritesheet_NPC02_M_walk.png".into(),
                 ..default()
             });
             enemy_queue.enemies.push(EnemySpawn {
@@ -208,7 +213,7 @@ fn spawn_enemy(
             },
             ColliderBundle {
                 collider: Collider {
-                    hit_box: Vec2::new(18.0 * 4.0, 18.0 * 4.0),
+                    hit_box: Vec2::new(18.0 * 4.0, 20.0 * 4.0),
                     ..default()
                 },
                 moving,

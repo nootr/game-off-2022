@@ -35,7 +35,8 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_state(GameState::MainMenu)
+        //app.add_state(GameState::MainMenu)
+        app.add_state(GameState::Start)
             .add_system_set(
                 SystemSet::on_enter(GameState::GameOver).with_system(set_game_over_timer),
             )
@@ -142,9 +143,28 @@ fn setup_start_text(mut commands: Commands, level: Res<Level>, asset_server: Res
                     ..default()
                 }),
                 TimeText {
-                    timer: Timer::new(Duration::from_secs(3), TimerMode::Once),
+                    timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
                 },
             ));
+
+            if let Some(help_text) = level.help_text() {
+                parent.spawn((TextBundle::from_section(
+                    format!("Hint: {}", help_text),
+                    TextStyle {
+                        font: asset_server.load("fonts/PixeloidSans.ttf"),
+                        font_size: 40.0,
+                        color: Color::GRAY,
+                    },
+                )
+                .with_style(Style {
+                    align_self: AlignSelf::Center,
+                    margin: UiRect {
+                        top: Val::Px(150.0),
+                        ..default()
+                    },
+                    ..default()
+                }),));
+            }
         });
 }
 
@@ -159,7 +179,7 @@ fn update_timer_text(
 
     if time_text.timer.finished() {
         game_state.set(GameState::InGame).unwrap();
-    } else if time_text.timer.elapsed_secs() < 1.5 {
+    } else if time_text.timer.elapsed_secs() < 3.5 {
         text.sections[0].value = "08:59 AM".to_string();
     } else {
         text.sections[0].value = "09:00 AM".to_string();

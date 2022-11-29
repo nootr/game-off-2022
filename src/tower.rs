@@ -63,7 +63,7 @@ fn setup_tower(
         },
         ColliderBundle {
             collider: Collider {
-                hit_box: Vec2::new(30.0 * 4.0, 30.0 * 4.0),
+                hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
                 ..default()
             },
             ..default()
