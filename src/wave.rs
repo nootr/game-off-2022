@@ -16,6 +16,7 @@ struct EnemySpawnEvent {
     attention_span: u64,
     sprite: String,
     sprite_size: Vec2,
+    location: Vec3,
 }
 
 #[derive(Debug)]
@@ -26,10 +27,13 @@ pub struct EnemySpawn {
     attention_span: u64,
     sprite: String,
     sprite_size: Vec2,
+    location: Vec3,
 }
 
 impl Default for EnemySpawn {
     fn default() -> Self {
+        let height = rand::thread_rng().gen_range(-36.0..36.0);
+
         EnemySpawn {
             spawn_timer: Timer::new(Duration::from_secs(0), TimerMode::Once),
             influence: 80.0,
@@ -37,6 +41,7 @@ impl Default for EnemySpawn {
             attention_span: 15,
             sprite: "sprites/spritesheet_NPC01_M_walk.png".into(),
             sprite_size: Vec2::new(16.0, 24.0),
+            location: Vec3::new(-640.0 - 4.0 * 12.0, height, 0.0),
         }
     }
 }
@@ -135,6 +140,7 @@ fn tick_wave(
                 attention_span: enemy_spawn.attention_span,
                 sprite: enemy_spawn.sprite.clone(),
                 sprite_size: enemy_spawn.sprite_size,
+                location: enemy_spawn.location,
             });
 
             false
@@ -149,24 +155,17 @@ fn spawn_enemy(
     mut ev_spawn_enemy: EventReader<EnemySpawnEvent>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    windows: Res<Windows>,
     audio: Res<Audio>,
 ) {
     let mut rng = rand::thread_rng();
 
     for ev in ev_spawn_enemy.iter() {
-        let window = windows.primary();
-        let half_width = window.width() as f32 * 0.5;
-        let half_height = window.height() as f32 * 0.5;
-
         let texture_handle = asset_server.load(&ev.sprite);
         let texture_atlas =
             TextureAtlas::from_grid(texture_handle, ev.sprite_size, 6, 1, None, None);
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-        let height = rand::thread_rng().gen_range(-half_height..half_height);
-
-        let moving_delta = rand::thread_rng().gen_range(-25.0..25.0);
+        let moving_delta = rng.gen_range(-25.0..25.0);
         let moving = Moving::new(Vec3::new(150.0 + moving_delta, 0.0, 0.0));
 
         let mut color = Color::from(ev.force_type);
@@ -201,7 +200,7 @@ fn spawn_enemy(
             SpriteSheetBundle {
                 texture_atlas: texture_atlas_handle,
                 transform: Transform {
-                    translation: Vec3::new(-half_width - 4.0 * 12.0, height, 0.0),
+                    translation: ev.location,
                     scale: Vec3::splat(4.0 * 1.5),
                     ..default()
                 },
