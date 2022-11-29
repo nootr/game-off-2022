@@ -208,7 +208,7 @@ fn spawn_enemy(
             },
             ColliderBundle {
                 collider: Collider {
-                    hit_box: Vec2::new(24.0 * 4.0, 24.0 * 4.0),
+                    hit_box: Vec2::new(18.0 * 4.0, 18.0 * 4.0),
                     ..default()
                 },
                 moving,
