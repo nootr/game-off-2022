@@ -78,7 +78,7 @@ fn lose_music(asset_server: Res<AssetServer>, audio: Res<Audio>, level: Res<Leve
 
 fn end_music(asset_server: Res<AssetServer>, audio: Res<Audio>) {
     audio
-        .play(asset_server.load("sounds/all_hands_on_deck_win.mp3"))
+        .play(asset_server.load("sounds/emotinialpathWithOscUnfilterloop.mp3"))
         .with_volume(0.5)
         .looped();
 }

@@ -264,7 +264,7 @@ fn show_end_screen(
             "You made it! Thanks for playing <3 Art by Guus, Audio by Tim, Code by Joris",
             TextStyle {
                 font: asset_server.load("fonts/PixeloidSans.ttf"),
-                font_size: 40.0,
+                font_size: 70.0,
                 color: Color::WHITE,
             },
         )
@@ -272,7 +272,7 @@ fn show_end_screen(
         .with_style(Style {
             position_type: PositionType::Absolute,
             position: UiRect {
-                top: Val::Px(5.0),
+                top: Val::Px(20.0),
                 left: Val::Px(1280.0),
                 ..default()
             },
@@ -281,7 +281,7 @@ fn show_end_screen(
         Volatile,
         ScrollText {
             left: 1280.0,
-            speed: 200.0,
+            speed: 250.0,
         },
     ));
 }
@@ -296,7 +296,7 @@ fn scroll_text(
     scroll.left -= time.delta_seconds() * scroll.speed;
     style.position.left = Val::Px(scroll.left);
 
-    if scroll.left < -1028.0 {
+    if scroll.left < -1500.0 {
         game_state.set(GameState::MainMenu).unwrap();
     }
 }
