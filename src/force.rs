@@ -4,6 +4,7 @@ use rand::Rng;
 
 use crate::camera::CameraShake;
 use crate::cost::Points;
+use crate::enemies::Enemy;
 use crate::game::{GameState, Volatile};
 use crate::ghost::Ghost;
 use crate::grid::snap;
@@ -89,7 +90,8 @@ fn mouse_button_input(
     mut ev_spawn_force: EventWriter<ForceSpawnEvent>,
     windows: Res<Windows>,
     mut uibar_query: Query<(&mut UIBar, &Node), With<UIBar>>,
-    solid_query: Query<(&Collider, &Transform), With<Solid>>,
+    solid_query: Query<(&Collider, &Transform), (With<Solid>, Without<Enemy>)>,
+    enemy_query: Query<(&Collider, &Transform), (With<Enemy>, Without<Solid>)>,
 ) {
     let (mut uibar, uibar_node) = uibar_query.single_mut();
     let window = windows.primary();
@@ -113,6 +115,20 @@ fn mouse_button_input(
                         solid_collider.hit_box,
                         position.extend(0.0),
                         Vec2::new(1.0, 1.0),
+                    )
+                    .is_some()
+                    {
+                        return;
+                    }
+                }
+
+                // Prevent player from placing on an enemy
+                for (enemy_collider, enemy_transform) in &enemy_query {
+                    if collide(
+                        enemy_transform.translation,
+                        enemy_collider.hit_box,
+                        position.extend(0.0),
+                        Vec2::new(24.0 * 4.0, 24.0 * 4.0),
                     )
                     .is_some()
                     {
