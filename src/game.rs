@@ -43,6 +43,7 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_state(GameState::MainMenu)
+            .add_system_set(SystemSet::on_enter(GameState::MainMenu).with_system(reset_level))
             .add_system_set(
                 SystemSet::on_enter(GameState::GameOver).with_system(set_game_over_timer),
             )
@@ -89,6 +90,10 @@ fn set_win_timer(mut commands: Commands) {
     commands.spawn(StateTimer {
         timer: Timer::new(Duration::from_secs(7), TimerMode::Once),
     });
+}
+
+fn reset_level(mut level: ResMut<Level>) {
+    level.level = 1;
 }
 
 fn next_level(mut level: ResMut<Level>) {
