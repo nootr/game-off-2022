@@ -137,9 +137,9 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
                 force_type: ForceType::Repel,
                 ..default()
             });
-            for _ in 1..128 {
+            for _ in 1..20 {
                 enemy_queue.enemies.push(EnemySpawn {
-                    spawn_timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
+                    spawn_timer: Timer::new(Duration::from_secs(12), TimerMode::Once),
                     sprite: "sprites/spritesheet_NPC03_M_walk.png".into(),
                     ..default()
                 });

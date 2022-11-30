@@ -92,7 +92,9 @@ fn mouse_button_input(
     mut uibar_query: Query<(&mut UIBar, &Node), With<UIBar>>,
     solid_query: Query<(&Collider, &Transform), (With<Solid>, Without<Enemy>)>,
     enemy_query: Query<(&Collider, &Transform), (With<Enemy>, Without<Solid>)>,
+    mut camera_query: Query<&mut CameraShake>,
 ) {
+    let mut shake = camera_query.single_mut();
     let (mut uibar, uibar_node) = uibar_query.single_mut();
     let window = windows.primary();
     let window_width = window.width();
@@ -118,6 +120,7 @@ fn mouse_button_input(
                     )
                     .is_some()
                     {
+                        shake.trauma += 0.5;
                         return;
                     }
                 }
@@ -132,6 +135,7 @@ fn mouse_button_input(
                     )
                     .is_some()
                     {
+                        shake.trauma += 0.5;
                         return;
                     }
                 }
