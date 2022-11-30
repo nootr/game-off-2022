@@ -96,11 +96,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
             .with_children(|parent| {
                 parent.spawn(
                     TextBundle::from_section(
-                        "Passive\n$30",
+                        "Box\nPassive\n$30",
                         TextStyle {
                             font: asset_server.load("fonts/PixeloidSans.ttf"),
-                            font_size: 30.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                            font_size: 20.0,
+                            color: Color::rgba(0.9, 0.9, 0.9, 0.7),
                         },
                     )
                     .with_text_alignment(TextAlignment::TOP_CENTER),
@@ -117,11 +117,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
             .with_children(|parent| {
                 parent.spawn(
                     TextBundle::from_section(
-                        "Attract\n$50",
+                        "Coffee\nAttract\n$50",
                         TextStyle {
                             font: asset_server.load("fonts/PixeloidSans.ttf"),
-                            font_size: 30.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                            font_size: 20.0,
+                            color: Color::rgba(0.9, 0.9, 0.9, 0.7),
                         },
                     )
                     .with_text_alignment(TextAlignment::TOP_CENTER),
@@ -138,11 +138,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, windows: Res<Wi
             .with_children(|parent| {
                 parent.spawn(
                     TextBundle::from_section(
-                        "Repel\n$60",
+                        "Work\nRepel\n$45",
                         TextStyle {
                             font: asset_server.load("fonts/PixeloidSans.ttf"),
-                            font_size: 30.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                            font_size: 20.0,
+                            color: Color::rgba(0.9, 0.9, 0.9, 0.7),
                         },
                     )
                     .with_text_alignment(TextAlignment::TOP_CENTER),
