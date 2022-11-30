@@ -42,7 +42,7 @@ impl ForceType {
         match self {
             ForceType::Passive => 30.0,
             ForceType::Attract => 50.0,
-            ForceType::Repel => 60.0,
+            ForceType::Repel => 45.0,
         }
     }
 }
@@ -167,8 +167,9 @@ fn spawn_force(
                     true => "sprites/BoxA.png",
                     false => "sprites/BoxB.png",
                 });
+                let sound = asset_server.load("sounds/doos1.mp3");
                 (
-                    None,
+                    Some(sound),
                     TextureAtlas::from_grid(
                         texture_handle,
                         Vec2::new(16.0, 16.0),
