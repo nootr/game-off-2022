@@ -119,6 +119,7 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
                 sprite: "sprites/spritesheet_NPC04_M_walk.png".into(),
+                sprite_size: Vec2::new(16.0, 32.0),
                 force_type: ForceType::Repel,
                 ..default()
             });
@@ -132,6 +133,7 @@ fn setup_wave(level: Res<Level>, mut enemy_queue: ResMut<EnemySpawnQueue>) {
             enemy_queue.enemies.push(EnemySpawn {
                 spawn_timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
                 sprite: "sprites/spritesheet_NPC04_M_walk.png".into(),
+                sprite_size: Vec2::new(16.0, 32.0),
                 force_type: ForceType::Repel,
                 ..default()
             });
