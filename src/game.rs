@@ -58,11 +58,11 @@ impl Plugin for GamePlugin {
             .add_system_set(
                 SystemSet::on_enter(GameState::Won)
                     .with_system(cleanup_volatile)
-                    .with_system(next_level)
                     .with_system(show_win_animation)
                     .with_system(set_win_timer),
             )
             .add_system_set(SystemSet::on_update(GameState::Won).with_system(tick_state_timer))
+            .add_system_set(SystemSet::on_exit(GameState::Won).with_system(next_level))
             .add_system_set(
                 SystemSet::on_enter(GameState::End)
                     .with_system(show_end_screen)
