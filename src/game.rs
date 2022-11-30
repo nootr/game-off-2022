@@ -261,7 +261,7 @@ fn show_end_screen(
 
     commands.spawn((
         TextBundle::from_section(
-            "You made it! Thanks for playing <3 Art by Guus, Audio by Tim, Code by Joris",
+            "And nobody was able to address the elephant in the room! Thanks for playing <3 Art by Guus, Audio by Tim, Code by Joris",
             TextStyle {
                 font: asset_server.load("fonts/PixeloidSans.ttf"),
                 font_size: 70.0,
@@ -296,7 +296,7 @@ fn scroll_text(
     scroll.left -= time.delta_seconds() * scroll.speed;
     style.position.left = Val::Px(scroll.left);
 
-    if scroll.left < -1500.0 {
+    if scroll.left < -3000.0 {
         game_state.set(GameState::MainMenu).unwrap();
     }
 }
